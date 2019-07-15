@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+</head>
+<body>
+    <div id="app">
+        <ul>
+            <li v-for="item in list" :key="item.id">
+                <input type="checkbox">
+               id:{{item.id}}  ----- name: {{item.name}}
+            </li>
+        </ul>
+        <input type="text" v-model="userInput">
+        <input type="button" value="添加" @click="add">
+    </div>
+    <script type="text/javascript" src="https://unpkg.com/vue"></script>
+    <script>
+        var vm = new Vue({
+            el:'#app',
+            data: {
+                list: [
+                    { id: 1, name: 'a'},
+                    { id: 2, name: 'b'},
+                    { id: 3, name: 'c'}
+                ],
+                userInput: ''
+            },
+            methods: {
+                add() {
+                    var newItem = {
+                        id: this.list.length+1,
+                        name: this.userInput
+                    }
+                    this.list.unshift(newItem)
+                    // push从底部添加 unshift
+                }
+            }
+        })
+    </script>
+</body>
+</html>
