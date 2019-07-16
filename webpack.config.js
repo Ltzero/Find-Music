@@ -20,7 +20,7 @@ module.exports = {
         rules: [  //第三方匹配规则
           { test: /\.js|jsx$/, use: 'babel-loader', exclude:/node_modules/}, //配置loader一定要添加exclude排除项
           { test: /\.css$/, use: ['style-loader', 'css-loader']}, //从webpack2开始loader不能省略
-          { test: /\.scss$/, use: ['style-loader', 'css-loader', 'sass-loader']} //配置sass-loader
+          { test: /\.scss$/, use: ['style-loader', 'css-loader?modules', 'sass-loader']} //配置sass-loader
         ]
     },
     resolve: {

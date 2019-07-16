@@ -1,6 +1,7 @@
 import React from 'react'
 import Carousel from '@/component/Home/component/carousel'
-import '@/css/home.scss'
+import ContentBlock from '@/component/Home/component/contentBlock'
+import LineBlock from '@/component/Home/component/lineBlock'
 
 export default class Home extends React.Component {
   constructor(props) {
@@ -10,9 +11,10 @@ export default class Home extends React.Component {
     }
   }
   render() {
-    return <div>
-      这是首页
+    return <div style={{height: '100%'}}>
       <Carousel></Carousel>
+      <ContentBlock></ContentBlock>
+      <LineBlock></LineBlock>
     </div>
   }
 }

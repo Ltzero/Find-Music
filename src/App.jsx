@@ -1,13 +1,17 @@
 import React from 'react'
 import { HashRouter, Route, Link} from 'react-router-dom'
 
-import Home from '@/component/home/home'
-import About from '@/component/about/about'
-import Movie from '@/component/movie/movie'
+import Home from '@/component/home/'
+import About from '@/component/about/'
+import Movie from '@/component/movie/'
 import 'antd/dist/antd.css';
+import '@/css/modifyAntD.scss'
+
 
 import { Layout, Menu } from 'antd';
 const { Header, Content, Footer } = Layout;
+
+import NavBar from './component/Home/component/navbar' 
 
 export default class App extends React.Component {
   constructor(props) {
@@ -17,8 +21,8 @@ export default class App extends React.Component {
   render() {
     // 除了有HashRouter外还有BrowserRouter,该标签只能定义一个并且内部只能含有一个根节点
     return <HashRouter>   
-    <Layout className="layout" style={{ height: '100%'}}>
-    <Header>
+    <Layout className="layout">
+    {/* <Header>
       <div className="logo" />
       <Menu
         theme="dark"
@@ -36,15 +40,16 @@ export default class App extends React.Component {
           <Link to="/about">关于</Link>
         </Menu.Item>
       </Menu>
-    </Header>
-    <Content style={{ height: '100%' }}>
-      <div style={{ background: '#fff', height: '100%' }}>
+    </Header> */}
+    <NavBar></NavBar>
+    <Content>
+      {/* <div style={{ background: '#fff', height: '100%' }}> */}
         <Route path="/home" component={ Home }></Route>
         <Route path="/movie" component={ Movie }></Route>
         <Route path="/about" component={ About }></Route>
-      </div>
+      {/* </div> */}
     </Content>
-    <Footer style={{ textAlign: 'center' }}> ©2018 Created by lint </Footer>
+    <Footer style={{ textAlign: 'center',background: '#333', color: '#fff' }}> ©2019 Created by lint </Footer>
   </Layout>
   </HashRouter>
   }

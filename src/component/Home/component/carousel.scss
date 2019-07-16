@@ -1,0 +1,16 @@
+.content {
+  background-repeat: repeat-x;
+  display: flex;
+  margin: 30px 5%;
+  // flex: 1;
+  .carousel {
+    width: 50%;
+    height: 350px;
+    margin-right: 15px;
+  }
+  .recommend {
+    width: 50%;
+    height: 350px;
+    // background: #eee;
+  }
+}
