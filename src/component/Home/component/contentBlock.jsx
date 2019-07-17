@@ -30,7 +30,6 @@ export default class ContentBlock extends React.Component{
   }
 
 
-
   render() {
     return <section style={{padding: '0 5% 30px 5%',  background: '#fff'}}>
       <Divider orientation="right" style={{fontSize: '24px', margin: 0, padding: '16px 0', color: '#62BFAD'}} className={styles.divider}>最新音乐</Divider>

@@ -1,17 +1,18 @@
 import React from 'react'
-import { HashRouter, Route, Link} from 'react-router-dom'
+import { HashRouter, Route } from 'react-router-dom'
 
 import Home from '@/component/home/'
 import About from '@/component/about/'
 import Movie from '@/component/movie/'
+import Details from '@/component/details/'
+
 import 'antd/dist/antd.css';
-import '@/css/modifyAntD.scss'
-
-
+// import '@/css/modifyAntD.scss'
 import { Layout, Menu } from 'antd';
-const { Header, Content, Footer } = Layout;
+const { Content, Footer } = Layout;
 
 import NavBar from './component/Home/component/navbar' 
+import MusicPlayer from './component/MusicPlayer/musicplayer';
 
 export default class App extends React.Component {
   constructor(props) {
@@ -22,32 +23,12 @@ export default class App extends React.Component {
     // 除了有HashRouter外还有BrowserRouter,该标签只能定义一个并且内部只能含有一个根节点
     return <HashRouter>   
     <Layout className="layout">
-    {/* <Header>
-      <div className="logo" />
-      <Menu
-        theme="dark"
-        mode="horizontal"
-        defaultSelectedKeys={[window.location.hash.split("/")[1]]}
-        style={{ lineHeight: '64px' }}
-      >
-        <Menu.Item key="home">
-          <Link to="/home">首页</Link>
-        </Menu.Item>
-        <Menu.Item key="movie">
-          <Link to="/movie">电影</Link>
-        </Menu.Item>
-        <Menu.Item key="about">
-          <Link to="/about">关于</Link>
-        </Menu.Item>
-      </Menu>
-    </Header> */}
+    <MusicPlayer></MusicPlayer>
     <NavBar></NavBar>
     <Content>
-      {/* <div style={{ background: '#fff', height: '100%' }}> */}
         <Route path="/home" component={ Home }></Route>
-        <Route path="/movie" component={ Movie }></Route>
+        <Route path="/details" component={ Details }></Route>
         <Route path="/about" component={ About }></Route>
-      {/* </div> */}
     </Content>
     <Footer style={{ textAlign: 'center',background: '#333', color: '#fff' }}> ©2019 Created by lint </Footer>
   </Layout>

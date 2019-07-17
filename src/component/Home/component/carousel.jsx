@@ -6,6 +6,7 @@ import styles from './carousel.scss'
 const gridStyle = {
   width: '33%',
   height: '120px',
+  lineHeight: '120px',
   padding: '0',
   textAlign: 'center',
 };
@@ -71,7 +72,8 @@ export default class homeCarousel extends React.Component {
           // title="热门推荐" 
           // style={{ textAlign: 'right'}}
           >
-            {this.state.hot.map( item=> {
+            {
+              this.state.hot.map( item=> {
               return <Card.Grid style={gridStyle} key={item.id} >
                 <img src={item.coverImgUrl} alt={item.name} style={{width: '100px', height: '100px'}}/>
                 {/* <p>{item.name}</p> */}

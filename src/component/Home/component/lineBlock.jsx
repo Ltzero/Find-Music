@@ -31,7 +31,7 @@ export default class LineBlock extends React.Component{
 
   render() {
     return <section style={{padding: '0 5% 30px 5%', background: '#FFFFF3'}}>
-      <Divider orientation="right" style={{fontSize: '24px',color: '#ff5035', margin: 0, padding: '16px 0'}} className={styles.divider}>歌单推荐</Divider>
+      <Divider orientation="right" style={{fontSize: '24px',color: 'rgba(238,34,51,0.47)', margin: 0, padding: '16px 0'}} className={styles.divider}>歌单推荐</Divider>
       {this.state.albumList.map( (item, index) => {
         if(index>3){
           return null
