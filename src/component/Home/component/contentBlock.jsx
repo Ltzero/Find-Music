@@ -1,6 +1,8 @@
 import React from 'react'
 import styles from './contentBlock.scss'
 import { Card, Divider  } from 'antd';
+
+import { Link } from 'react-router-dom'
 const { Meta } = Card;
 
 export default class ContentBlock extends React.Component{
@@ -35,10 +37,10 @@ export default class ContentBlock extends React.Component{
       <Divider orientation="right" style={{fontSize: '24px', margin: 0, padding: '16px 0', color: '#62BFAD'}} className={styles.divider}>最新音乐</Divider>
       <div className={styles.content}>
         { this.state.newList.map( item => {
-          return  <Card
-            key={item.id}
+          return <div className={styles.item} key={item.id}> 
+          <Link to={"/details/"+item.id}>
+          <Card
             hoverable
-            style={{ width: '18%', margin: '0 15px 15px 0' }}
             cover={<img alt={ item.name } src={item.song.album.picUrl} />}
           >
           <Meta title={item.name} description={(item.song.artists).map( (artist,index) => {
@@ -46,6 +48,8 @@ export default class ContentBlock extends React.Component{
             return artist.name + '/'
           })}/>
         </Card>
+        </Link>
+        </div>
         })}
       </div>
     </section>

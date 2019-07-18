@@ -28,3 +28,20 @@
     z-index: 100;
   }
 }
+.action {
+  display: flex;
+  justify-content: space-around;
+  .play {
+    display: block;
+    width: 20px;
+    text-align: center;
+    border-radius: 50%;
+  }
+  .delete {
+    display: block;
+    width: 20px;
+    text-align: center;
+  }  
+}
+
+

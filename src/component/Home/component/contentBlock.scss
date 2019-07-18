@@ -3,4 +3,8 @@
   display: flex;
   flex-wrap: wrap;
   justify-content: space-around;
+  .item {
+    width: 18%;
+    margin: 0 15px 15px 0;
+  }
 }

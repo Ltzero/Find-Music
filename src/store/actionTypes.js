@@ -1,0 +1,6 @@
+export const GET_SONG_DETAILS = 'get_song_details'
+export const GET_LRC = 'get_lrc'
+export const COMPUTED_LRC = 'computed_lrc'
+export const ADD_TO_MY_LIST = 'add_to_my_list'
+export const OPEN_MUSIC_LIST = 'open_music_list'
+export const CLOSE_MUSIC_LIST = 'close_music_list'

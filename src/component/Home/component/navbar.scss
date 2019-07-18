@@ -23,7 +23,8 @@
     margin: 0;
     padding: 0;
     line-height: 60px;
-    li:nth-child(n) {
+    .link {
+      li {
         background: #fff;
         display: inline-block;
         border-right: 1px solid #c9c9c9;
@@ -40,14 +41,7 @@
       }
     li:hover{
       width: 160px;
-    };
-    li:nth-child(2n) {
-      background: #000;
-      display: inline-block; 
-      color: #fff;  
-      a {
-        color: #fff;  
-      }
+    }
     }
   }
   .content{

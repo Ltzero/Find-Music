@@ -26,8 +26,9 @@ export default class App extends React.Component {
     <MusicPlayer></MusicPlayer>
     <NavBar></NavBar>
     <Content>
+        <Route path="/" exact component={ Home }></Route>
         <Route path="/home" component={ Home }></Route>
-        <Route path="/details" component={ Details }></Route>
+        <Route path="/details/:id" component={ Details } ></Route>
         <Route path="/about" component={ About }></Route>
     </Content>
     <Footer style={{ textAlign: 'center',background: '#333', color: '#fff' }}> ©2019 Created by lint </Footer>

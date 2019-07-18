@@ -1,15 +1,7 @@
 import React from 'react'
-import { Carousel, Card } from 'antd'
+import { Carousel, Card, Divider } from 'antd'
 import styles from './carousel.scss'
-
-
-const gridStyle = {
-  width: '33%',
-  height: '120px',
-  lineHeight: '120px',
-  padding: '0',
-  textAlign: 'center',
-};
+import { Link } from 'react-router-dom'
 
 export default class homeCarousel extends React.Component {
   constructor(props) {
@@ -25,7 +17,7 @@ export default class homeCarousel extends React.Component {
     this.getHot()
   }
 
-  getHot(cat = '全部', pageSize = 9, page = 0) {
+  getHot(cat = '全部', pageSize = 6, page = 0) {
     const url = `https://v1.itooi.cn/netease/songList/hot?cat=${cat}&pageSize=${pageSize}&page=${page}`
     fetch(url)
     .then( response => {
@@ -38,7 +30,6 @@ export default class homeCarousel extends React.Component {
       })
     })
   }
-
 
   getCarousel() {
     fetch('https://v1.itooi.cn/netease/banner')
@@ -53,7 +44,6 @@ export default class homeCarousel extends React.Component {
     })
   }
 
-
   render() {
     return <section className={styles.content}>
       <div className={styles.carousel}>
@@ -61,27 +51,37 @@ export default class homeCarousel extends React.Component {
         { this.state.pics.map( item => {
             return <div key={item.targetId}>
               <div style={{ background: 'url('+item.backgroundUrl+')'}}>
-                <div><img src={item.picUrl} alt={item.targetId}/></div>
+                <div>
+                  {
+                    item.targetType === '1' 
+                    ? <Link to={ '/details/'+item.targetId }><img src={item.picUrl} alt={item.targetId}/></Link>
+                    : <img src={item.picUrl} alt={item.targetId}/>
+                  }
+                </div>
               </div>
             </div>
         })}
         </Carousel>
       </div>
       <div className={styles.recommend}>
-        <Card 
-          // title="热门推荐" 
-          // style={{ textAlign: 'right'}}
-          >
+        <Card bodyStyle={{padding: '0 30px 25px 30px'}}>
+        <Divider orientation="right" style={{color: '#666', fontWeight: '600'}}>大家都在听</Divider>
             {
               this.state.hot.map( item=> {
-              return <Card.Grid style={gridStyle} key={item.id} >
-                <img src={item.coverImgUrl} alt={item.name} style={{width: '100px', height: '100px'}}/>
-                {/* <p>{item.name}</p> */}
-              </Card.Grid>
+              return <Link key={item.id} to={'/home'}>
+              <div className={styles.item}> 
+                <Card.Grid className={styles.grid} key={item.id} >
+                <img src={item.coverImgUrl} alt={item.name} style={{width: '90px', height: '90px'}}/>
+                <div className={styles.info}>
+                  <span className={styles.count}>{item.playCount}</span>
+                  <p className={styles.name}>{item.name}</p>
+                </div>
+                </Card.Grid>
+              </div>
+              </Link>
             })}
         </Card>
       </div>
-
       </section>
   }
 }

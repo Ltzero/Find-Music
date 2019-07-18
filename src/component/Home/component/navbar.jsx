@@ -17,10 +17,10 @@ export default class ClassName extends React.Component {
       <div className={styles.logo}>
         LOGO
       </div>
-        <li><Link to="/home">首页</Link></li>
-        <li><Link to="/details">最新音乐</Link></li>
-        <li><Link to="/home">歌单推荐</Link></li>
-        <li><Link to="/home">热门歌单</Link></li>
+        <Link to="/home" className={styles.link}><li style={{background: '#333', color: "#FFF"}}>首页</li></Link>
+        <Link to="/home" className={styles.link}><li>最新音乐</li></Link>
+        <Link to="/home" className={styles.link}><li>歌单推荐</li></Link>
+        <Link to="/home" className={styles.link}><li>热门歌单</li></Link>
       </ul>
       <div className={styles.content}>
         <input className={styles.search} type="text" placeholder="发现音乐~"/>

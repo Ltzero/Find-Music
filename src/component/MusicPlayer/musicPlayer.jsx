@@ -1,37 +1,68 @@
 import React from 'react'
 
 import styles from './musicPlayer.scss'
-import { Drawer } from 'antd'
+import { Drawer, Table, Icon } from 'antd'
+import { store } from '@/store/'
+import { openMusicListAction, closeMusicListAction } from '@/store/actionCreator'
+
+const columns = [
+  {
+    title: 'Name',
+    dataIndex: 'name',
+    key: 'name',
+
+  },
+  {
+    title: 'Singer',
+    dataIndex: 'singer',
+    key: 'singer',
+  },
+  {
+    title: 'Time',
+    dataIndex: 'time',
+    key: 'time',
+
+  },
+  {
+    title: 'Action',
+    key: 'action',
+    render: () => (
+      <span className={styles.action}>
+        <a className={styles.play} href="javascript:;"><Icon type="caret-right"/></a>
+        <a className={styles.delete} href="javascript:;"><Icon type="delete" /></a>
+      </span>
+    ),
+
+  }
+];
 
 export default class MusicPlayer extends React.Component {
   constructor() {
     super()
-    this.state = {
-      top: 0,
-      visible: false, 
-      placement: 'left'
-    }
+    // this.state = {
+    //   visible: false
+    // }
+    this.state = store.getState()
+    store.subscribe(this.handleStoreChange)
+  }
+
+  handleStoreChange = () => {
+    // 从store中获取最新的数据并更新数据
+    this.setState(store.getState())
   }
 
   showDrawer = () => {
-    this.setState({
-      visible: true,
-    })
+    // this.setState({
+    //   visible: true,
+    // })
+    const action = openMusicListAction(true)
+    store.dispatch(action)
   }
 
   onClose = () => {
-    this.setState({
-      visible: false,
-    })
+    const action = closeMusicListAction(false)
+    store.dispatch(action)
   }
-
-  onChange = e => {
-    this.setState({
-      placement: e.target.value,
-    })
-  }
-
-
 
   render() {
     return <div>
@@ -41,14 +72,26 @@ export default class MusicPlayer extends React.Component {
         </div>
         <Drawer
           title="播放列表"
-          placement={this.state.placement}
-          height={40}
+          placement={'left'}
+          width={400}
           mask={false}
-          keyboard={true}
-          closable={false}
+          closable={true}
           onClose={this.onClose}
           visible={this.state.visible}
+          bodyStyle={{padding:0}}
         >
+          {/* <div class="">
+            <audio src=""></audio>
+          </div> */}
+
+
+          <Table 
+            columns={columns} 
+            pagination={false}
+            rowKey={this.state.myList.map( item => {return item.id})}
+            // showHeader={false}
+            dataSource={this.state.myList}
+          />
         </Drawer>   
     </div>
   }
