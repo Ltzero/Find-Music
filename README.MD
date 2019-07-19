@@ -1,4 +1,12 @@
 #### React-Music
 - 技术栈
   - React
+  - redux
+- ui
   - antDesign
+- 构建
+  - webpack
+### 页面
+- 首页
+- 详情页
+- 播放器

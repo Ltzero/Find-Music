@@ -12,10 +12,17 @@ export default class homeCarousel extends React.Component {
     }
   }
 
-  componentWillMount() {
+  componentDidMount() {
     this.getCarousel()
     this.getHot()
   }
+
+  componentWillUnmount(){
+    this.setState = (state,callback)=>{
+     return
+     }
+  }
+
 
   getHot(cat = '全部', pageSize = 6, page = 0) {
     const url = `https://v1.itooi.cn/netease/songList/hot?cat=${cat}&pageSize=${pageSize}&page=${page}`

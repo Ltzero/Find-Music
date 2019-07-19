@@ -1,24 +1,30 @@
 import React from 'react'
 
 import styles from './mainBlock.scss'
-import { Button, Divider } from 'antd';
+import { Button, Divider, notification, Icon } from 'antd';
 import { store } from '@/store'
 
-import { getSongDetailsAction, computedLrcAction, getLrcAction, addToMyListAction } from '@/store/actionCreator'
+import { getSongDetailsAction, computedLrcAction, getLrcAction, addToMyListAction, switchMusicPlayerAction, changePlayerMusicAction, openMusicListAction } from '@/store/actionCreator'
+
+import { separateSingers } from '@/utils'
+
+const openNotification = () => {
+  const args = {
+    message: '提示',
+    description:
+      '该歌曲由于未bei知ban原因le不可播放,试试别的吧~',
+    icon: <Icon type="smile" style={{ color: '#F0CF61' }} />
+  }
+  notification.open(args)
+}
+
+
 
 
 export default class MainBlock extends React.Component {
   constructor(props) {
       super(props)
       this.state = store.getState()
-      // this.state={
-      //   songs: [],
-      //   musicUrl: '',
-      //   lrc: '',
-      //   flag: false,
-      //   comptedLrc: []
-      // }
-
       // 订阅store中内容的变化执行监听回掉
       store.subscribe(this.handleStoreChange)
   }
@@ -32,18 +38,17 @@ export default class MainBlock extends React.Component {
   componentDidMount() {
     this.getSongDetails(this.props.id)
     this.getLrc(this.props.id).then( () => {
-      // this.setState({
-      //   comptedLrc: this.computedLrc()
-      // })
       const comLrc = this.computedLrc()
-      // const action = {
-      //   type: COMPUTED_LRC,
-      //   value: comLrc
-      // }
       const action = computedLrcAction(comLrc)
       store.dispatch(action) 
     })
   }
+
+  componentWillUnmount(){
+    this.setState = (state,callback)=>{
+     return
+     }
+   }
 
   // 获取歌曲详情
   getSongDetails(id) {
@@ -54,10 +59,6 @@ export default class MainBlock extends React.Component {
         return response.json()
       })
       .then((data) => {
-
-        // this.setState({
-        //   songs: data.data.songs
-        // })
         // 编写action
         const action = getSongDetailsAction(data.data.songs)
         store.dispatch(action)
@@ -97,40 +98,40 @@ export default class MainBlock extends React.Component {
       <section className={styles.recommend}>
         <div className={styles.list}></div>
       </section>
-      <audio ref="audio"></audio>
     </section>
   }
 
-  addToList() {
+  addToList(url) {
     // 建立一个音乐粗略信息文本
-    // console.log(this.state.songs)
     const songsData = this.state.songs[0]
-    let singers = ''
-    songsData.ar.map( item => {
-      singers += item.name + ''
-    })
-
+    const singers = separateSingers(songsData.ar)
     const song = {
       id: songsData.id,
       name: songsData.name,
       singer: singers,
       time: songsData.dt,
       cover: songsData.al.picUrl,
+      playUrl: url
     }
-    const action = addToMyListAction(song)
-    store.dispatch(action)
+    const action1 = addToMyListAction(song)
+    store.dispatch(action1)
+
+    const action2 = changePlayerMusicAction(song)
+    store.dispatch(action2)
+
   }
-
-
-
 
   // 添加到列表并播放
   playMusic = () => {
-    this.addToList()
-    // this.getMusicUrl(this.props.id).then( ()=> {
-    //   this.refs.audio.src = this.state.musicUrl
-    //   this.refs.audio.autoplay = true
-    // })
+    this.getMusicUrl(this.props.id).then( data => {
+      this.addToList(data)
+
+      const action1 = switchMusicPlayerAction(true)
+      store.dispatch(action1)
+
+      const action2 = openMusicListAction(true)
+      store.dispatch(action2)
+    })
   }
 
   getMusicUrl(id) {
@@ -138,16 +139,22 @@ export default class MainBlock extends React.Component {
       const url = `https://v1.itooi.cn/netease/url?id=${id}&quality=flac`
       fetch(url)
       .then((response) => {
-        if(response.status === 200)
-        return response.url
+        if(response.status === 200){
+          return response.url
+        } else {
+          // 请求地址失败 一般403 
+          openNotification()
+          reject()
+        }
       })
       .then((data) => {
-        console.log(data)
-        resolve()
-        // this.setState({
-        //   musicUrl: data
-        // })
-        // resolve()
+        // const audioState = {
+        //   id: this.props.id,
+        //   playUrl: data
+        // }
+        // const action = changePlayerMusicAction(audioState)
+        // store.dispatch(action)
+        resolve(data)
       })
     })
   }
@@ -173,7 +180,6 @@ export default class MainBlock extends React.Component {
 
   // 展开歌词列表
   toggleLrc = () => {
-    console.log(this.state.flag)
     if(this.state.flag) {
       this.refs.lrc.style.height = '300px'
       this.setState({

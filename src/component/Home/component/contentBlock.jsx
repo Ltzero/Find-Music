@@ -3,6 +3,8 @@ import styles from './contentBlock.scss'
 import { Card, Divider  } from 'antd';
 
 import { Link } from 'react-router-dom'
+
+import { separateSingers } from '@/utils'
 const { Meta } = Card;
 
 export default class ContentBlock extends React.Component{
@@ -13,8 +15,14 @@ export default class ContentBlock extends React.Component{
     }
   }
 
-  componentWillMount(){
+  componentDidMount(){
     this.getNewlyMusic()
+  }
+
+  componentWillUnmount(){
+    this.setState = (state,callback)=>{
+     return
+     }
   }
 
   getNewlyMusic() {
@@ -43,10 +51,7 @@ export default class ContentBlock extends React.Component{
             hoverable
             cover={<img alt={ item.name } src={item.song.album.picUrl} />}
           >
-          <Meta title={item.name} description={(item.song.artists).map( (artist,index) => {
-            if(index===(item.song.artists).length-1) return artist.name +' '
-            return artist.name + '/'
-          })}/>
+          <Meta title={item.name} description={separateSingers(item.song.artists)}/>
         </Card>
         </Link>
         </div>

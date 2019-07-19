@@ -11,8 +11,14 @@ export default class LineBlock extends React.Component{
     }
   }
 
-  componentWillMount(){
+  componentDidMount(){
     this.getHighQualitySongList()
+  }
+
+  componentWillUnmount(){
+    this.setState = (state,callback)=>{
+     return
+     }
   }
 
   getHighQualitySongList(cat = '全部', pageSize = 4) {
