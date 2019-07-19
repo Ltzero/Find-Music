@@ -26,3 +26,11 @@ export const getMusicInfo = (id, arry) => {
     }
   })
 }
+
+export const findIndexByKey = (arry, attr, key) => {
+  return arry.findIndex( (item ) => {
+    if(item[`${attr}`] === key ) {
+      return true
+    }
+  })
+}

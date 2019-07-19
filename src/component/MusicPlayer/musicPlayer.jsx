@@ -1,11 +1,11 @@
 import React from 'react'
 
 import styles from './musicPlayer.scss'
-import { Drawer, Table, Icon, Progress } from 'antd'
+import { Drawer, Table, Icon, Progress, Button } from 'antd'
 import { store } from '@/store/'
-import { openMusicListAction, closeMusicListAction, switchMusicPlayerAction, setPlayerProgressAction, removeFromMyListAction, changeMusicOrder } from '@/store/actionCreator'
+import { openMusicListAction, closeMusicListAction, switchMusicPlayerAction, setPlayerProgressAction, removeFromMyListAction, changeMusicOrderAction, changePlayerMusicAction, changePlayerModeAction } from '@/store/actionCreator'
 
-import { formateDuration } from '@/utils'
+import { formateDuration, findIndexByKey } from '@/utils'
 
 
 
@@ -87,8 +87,8 @@ export default class MusicPlayer extends React.Component {
                 {/* <img src={ this.state.audio.cover } alt={ this.state.audio.name }/> */}
               </div>
               <div className={styles.info}>
-                <h3>{ this.state.audio.name }</h3>
-                <p>{ this.state.audio.singer }</p>
+                <h3>{ this.state.audio ? this.state.audio.name : '' }</h3>
+                <p>{ this.state.audio ? this.state.audio.singer : '' }</p>
               </div>
             </div>
             <div className={styles.progress}>
@@ -107,29 +107,62 @@ export default class MusicPlayer extends React.Component {
               { this.state.audio === '' ? '0:0' : formateDuration(this.state.audio.time) }
               </div>
             </div>
-            <div>
-              <button onClick={ this.playMusic }>{ this.state.audio === '' ? '暂无' : this.state.isPlay ? '暂停': '播放' }</button>
-              <button>上一曲</button>
-              <button>下一曲</button>
+            <div className={styles.option}>
+              <div className={styles.base}>
+                <Button shape="circle" icon="step-backward" onClick={ this.changeMusic.bind(this, 'pre') } ></Button>
+                <Button size="large" shape="circle" onClick={ this.playMusic } icon={ this.state.audio === '' ? 'caret-right' : this.state.isPlay ? 'pause': 'caret-right'}>
+                </Button>
+                <Button shape="circle" icon="step-forward" onClick={ this.changeMusic.bind(this, 'next')} ></Button>
+              </div>
+              <div className={styles.extend}>
+                <Button onClick={ this.changePlayerMode.bind(this, 'list_cycle') } >
+                  列表循环
+                </Button>
+                <Button onClick={ this.changePlayerMode.bind(this, 'single_cycle') } >
+                  单曲循环
+                </Button>
+                <Button onClick={ this.changePlayerMode.bind(this, 'list_order') } >
+                  顺序播放
+                </Button>
+                <Button onClick={ this.changePlayerMode.bind(this, 'random_cycle') } >
+                  随机播放
+                </Button>
+              </div>
             </div>
           </div>
 
-          <audio ref="audio" autoPlay src = { this.state.audio && this.state.audio.playUrl } onTimeUpdate={ this.handleTimeUpdate }></audio>
+          <audio ref="audio" autoPlay src = { this.state.audio && this.state.audio.playUrl } onTimeUpdate={ this.handleTimeUpdate } onEnded={ this.handleMusicEnded}></audio>
           <Table 
             columns={columns} 
             pagination={false}
             rowKey={ record => record.id }
             showHeader={false}
             dataSource={this.state.myList}
+            onRow={ this.handleOnRow }
           />
         </Drawer>   
     </div>
   }
 
-  removeMusic = (record) => {
+  removeMusic = record => {
     const action = removeFromMyListAction(record.id)
     store.dispatch(action)
   }
+
+  changeMusic = option => {
+    if(this.state.myList.length===0) {
+      return false
+    }
+    const action = changeMusicOrderAction(option)
+    store.dispatch(action)
+  }
+
+  changePlayerMode = mode => {
+    const action = changePlayerModeAction(mode)
+    store.dispatch(action)
+  }
+
+
 
   playMusic = () => {
     if(this.state.isPlay) {
@@ -137,6 +170,9 @@ export default class MusicPlayer extends React.Component {
       store.dispatch(action) 
       this.refs.audio.pause()
     } else {
+      if(this.state.myList.length===0) {
+        return false
+      }
       const action = switchMusicPlayerAction(true)
       store.dispatch(action) 
       this.refs.audio.play()
@@ -144,8 +180,59 @@ export default class MusicPlayer extends React.Component {
   }
   
   handleTimeUpdate = () => {
-    
     const action = setPlayerProgressAction(this.refs.audio.currentTime)
     store.dispatch(action)
+  }
+
+  handleMusicEnded = () => {
+    if(this.state.myList.length===0) return false
+    const index = findIndexByKey(this.state.myList, 'id', this.state.audio.id )
+    // 顺序播放 单曲循环 列表循环 列表随机
+    switch(this.state.playMode) {
+      case 'single_cycle': 
+        this.refs.audio.load()
+        this.refs.audio.play()
+        break
+      case 'random_cycle':
+        const random = ~~(Math.random()*this.state.myList.length)
+        const action = changePlayerMusicAction(this.state.myList[random])
+        store.dispatch(action)
+        break
+      case 'list_order':
+        // let index = findIndexByKey(this.state.myList, 'id', this.state.audio.id )
+        if(index === -1) console.log(err)
+        if(index === this.state.myList.length-1) {
+          const action = switchMusicPlayerAction(false)
+          store.dispatch(action) 
+        } else {
+          const action = changePlayerMusicAction(this.state.myList[index+1])
+          store.dispatch(action)
+        }
+        break
+      case 'list_cycle':
+        // let index = findIndexByKey(this.state.myList, 'id', this.state.audio.id )
+        if(index === -1) console.log(err)
+        // 是否会设置相同值
+        if(index === this.state.myList.length-1) {
+          const action = changePlayerMusicAction(this.state.myList[0])
+          store.dispatch(action)
+        } else {
+          const action = changePlayerMusicAction(this.state.myList[index+1])
+          store.dispatch(action)
+        }
+        break
+    }
+  }
+
+
+  handleOnRow = record => {
+    return {
+      onDoubleClick: () => {
+        // 播放双击歌曲
+        const action = changePlayerMusicAction(record)
+        store.dispatch(action)
+
+      }
+    }
   }
 }

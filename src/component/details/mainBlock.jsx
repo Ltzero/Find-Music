@@ -148,12 +148,6 @@ export default class MainBlock extends React.Component {
         }
       })
       .then((data) => {
-        // const audioState = {
-        //   id: this.props.id,
-        //   playUrl: data
-        // }
-        // const action = changePlayerMusicAction(audioState)
-        // store.dispatch(action)
         resolve(data)
       })
     })
@@ -168,9 +162,6 @@ export default class MainBlock extends React.Component {
         return response.text()
       })
       .then((data) => {
-        // this.setState({
-        //   lrc: data
-        // })
         const action = getLrcAction(data)
         store.dispatch(action)
         resolve()

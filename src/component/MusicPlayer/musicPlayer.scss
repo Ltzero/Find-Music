@@ -90,6 +90,22 @@
       margin-right: 20px;
     }
   }
+  .option {
+    display: flex;
+    border-top: 1px solid #e6e6e6;
+    border-bottom: 1px solid #e6e6e6;
+    padding: 10px 5%;
+    .base {
+      display: flex;
+      align-items: center;
+      justify-content: space-around;
+      width: 45%;
+    }
+    .extend {
+      flex: 1;
+
+    }
+  }
 }
 
 

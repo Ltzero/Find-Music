@@ -1,4 +1,4 @@
-import { GET_SONG_DETAILS, GET_LRC, COMPUTED_LRC, ADD_TO_MY_LIST, OPEN_MUSIC_LIST, CLOSE_MUSIC_LIST, SWITCH_MUSIC_PLAYER, CHANGE_PLAYER_MUSIC, SET_PLAYER_PROGRESS, REMOVE_FROM_MY_LIST, CHANGE_MUSIC_ORDER } from './actionTypes'
+import { GET_SONG_DETAILS, GET_LRC, COMPUTED_LRC, ADD_TO_MY_LIST, OPEN_MUSIC_LIST, CLOSE_MUSIC_LIST, SWITCH_MUSIC_PLAYER, CHANGE_PLAYER_MUSIC, SET_PLAYER_PROGRESS, REMOVE_FROM_MY_LIST, CHANGE_MUSIC_ORDER, CHANGE_PLAYER_MODE } from './actionTypes'
 
 // 创建事件对应的action
 export const getSongDetailsAction = value => ({
@@ -51,7 +51,12 @@ export const removeFromMyListAction = value => ({
   value
 })
 
-export const changeMusicOrder = value => ({
+export const changeMusicOrderAction = value => ({
   type: CHANGE_MUSIC_ORDER,
+  value
+})
+
+export const changePlayerModeAction = value => ({
+  type: CHANGE_PLAYER_MODE,
   value
 })
