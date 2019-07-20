@@ -1,5 +1,5 @@
 // 引入actiontypes
-import { GET_SONG_DETAILS, GET_LRC, COMPUTED_LRC, ADD_TO_MY_LIST, OPEN_MUSIC_LIST, CLOSE_MUSIC_LIST, SWITCH_MUSIC_PLAYER, CHANGE_PLAYER_MUSIC, SET_PLAYER_PROGRESS, REMOVE_FROM_MY_LIST, CHANGE_MUSIC_ORDER, CHANGE_PLAYER_MODE } from './actionTypes'
+import { GET_SONG_DETAILS, GET_LRC, COMPUTED_LRC, ADD_TO_MY_LIST, OPEN_MUSIC_LIST, CLOSE_MUSIC_LIST, SWITCH_MUSIC_PLAYER, CHANGE_PLAYER_MUSIC, SET_PLAYER_PROGRESS, REMOVE_FROM_MY_LIST, CHANGE_MUSIC_ORDER, CHANGE_PLAYER_MODE, SEARCH_SINGLE_MUSIC, GET_SONG_LIST_DETAILS } from './actionTypes'
 
 
 // 给数据赋初值用于第一次渲染
@@ -12,13 +12,15 @@ const defaultState = {
   progress: 0,
   audio: '',
   playMode: 'list_order',
-  // 详情页的state
+  // 歌曲详情
   flag: false,
-
   songs: [],
-  // musicUrl: '',
   lrc: '',
-  comptedLrc: []
+  comptedLrc: [],
+  // 歌单详情
+  songList: [],
+  // 搜索页state
+  singerList: []
 }
 // 暴露一个纯函数reducer
 export const reducer = (state = defaultState , action) => {
@@ -60,7 +62,12 @@ export const reducer = (state = defaultState , action) => {
             return item.id !== action.value
           })
         }
-        return newState     
+        return newState
+        // 歌单
+    case GET_SONG_LIST_DETAILS:
+        newState.songList = action.value
+        return newState
+
     case OPEN_MUSIC_LIST:
         newState.visible = action.value
         return newState
@@ -75,8 +82,6 @@ export const reducer = (state = defaultState , action) => {
         return newState
     case CHANGE_MUSIC_ORDER:
         const index = newState.myList.findIndex( item => {
-          // console.log(item)
-          // console.log(newState.audio.id)
           if(item.id === newState.audio.id) {
             return true
           }
@@ -108,6 +113,16 @@ export const reducer = (state = defaultState , action) => {
         return newState
     case CHANGE_PLAYER_MODE:
         newState.playMode = action.value
+        return newState
+    case SEARCH_SINGLE_MUSIC:
+        newState.singerList = action.value
+        // const Param = {
+        //   id: 'id',
+        //   name: '歌曲名',
+        //   singer: '歌手名',
+        //   album: '专辑名',
+        //   time: '时长'
+        // }
         return newState    
     default:
       return state

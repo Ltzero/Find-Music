@@ -2,14 +2,23 @@ import React from 'react'
 import styles from './navbar.scss'
 import { Icon, Affix } from 'antd'
 import { Link } from 'react-router-dom'
+import PropTypes from 'prop-types'
+import { withRouter } from 'react-router-dom'
 
-export default class ClassName extends React.Component {
+class Navbar extends React.Component {
   constructor(props) {
       super(props)
       this.state={
         top: 0
       }
   }
+
+  // static propTypes = {
+  //   match: PropTypes.object.isRequired,
+  //   location: PropTypes.object.isRequired,
+  //   history: PropTypes.object.isRequired
+  // }
+
   render() {
     return <Affix offsetTop={this.state.top}>
       <div className={styles.nav}>
@@ -23,10 +32,18 @@ export default class ClassName extends React.Component {
         <Link to="/home" className={styles.link}><li>热门歌单</li></Link>
       </ul>
       <div className={styles.content}>
-        <input className={styles.search} type="text" placeholder="发现音乐~"/>
-        <button className={styles.submit}><Icon type="search" /></button>
+        <input className={styles.search} type="text" placeholder="发现音乐~" ref="enter"/>
+        <button className={styles.submit} onClick={ this.handleSearch }><Icon type="search" /></button>
       </div>
     </div>
     </Affix>
   }
+
+  handleSearch = () => {
+    const key = this.refs.enter.value
+    this.props.history.push({pathname : '/search', state:{key}})
+    
+  }
 }
+
+export default withRouter(Navbar)

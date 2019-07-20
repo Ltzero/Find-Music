@@ -11,7 +11,7 @@ export const formateDuration = duration => {
   const minutes = Math.floor(duration/1000/60)
   let secends = Math.round(duration/1000%60)
 
-  if(secends < 9) {
+  if(secends <= 9) {
     secends = '0' + secends
   } 
   return `${ hours === 0 ? '' : hours + ':' }${minutes}:${secends}`

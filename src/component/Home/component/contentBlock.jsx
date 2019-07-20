@@ -46,7 +46,7 @@ export default class ContentBlock extends React.Component{
       <div className={styles.content}>
         { this.state.newList.map( item => {
           return <div className={styles.item} key={item.id}> 
-          <Link to={"/details/"+item.id}>
+          <Link to={"/details/song/"+item.id}>
           <Card
             hoverable
             cover={<img alt={ item.name } src={item.song.album.picUrl} />}

@@ -61,7 +61,7 @@ export default class homeCarousel extends React.Component {
                 <div>
                   {
                     item.targetType === '1' 
-                    ? <Link to={ '/details/'+item.targetId }><img src={item.picUrl} alt={item.targetId}/></Link>
+                    ? <Link to={ '/details/song/'+item.targetId }><img src={item.picUrl} alt={item.targetId}/></Link>
                     : <img src={item.picUrl} alt={item.targetId}/>
                   }
                 </div>
@@ -75,7 +75,7 @@ export default class homeCarousel extends React.Component {
         <Divider orientation="right" style={{color: '#666', fontWeight: '600'}}>大家都在听</Divider>
             {
               this.state.hot.map( item=> {
-              return <Link key={item.id} to={'/home'}>
+              return <Link key={item.id} to={'/details/songList/' + item.id }>
               <div className={styles.item}> 
                 <Card.Grid className={styles.grid} key={item.id} >
                 <img src={item.coverImgUrl} alt={item.name} style={{width: '90px', height: '90px'}}/>

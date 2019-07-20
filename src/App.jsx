@@ -1,14 +1,15 @@
 import React from 'react'
 import { HashRouter, Route } from 'react-router-dom'
 
-import Home from '@/component/home/'
-import About from '@/component/about/'
-import Movie from '@/component/movie/'
-import Details from '@/component/details/'
+import Home from '@/component/home'
+import songDetail from '@/component/details/songDetail'
+import albumDetails from '@/component/details/albumDetail'
+import songListDetail from '@/component/details/songListDetail'
+
+import Search from '@/component/Search'
 
 import 'antd/dist/antd.css';
-// import '@/css/modifyAntD.scss'
-import { Layout, Menu } from 'antd';
+import { Layout } from 'antd';
 const { Content, Footer } = Layout;
 
 import NavBar from './component/Home/component/navbar' 
@@ -28,8 +29,10 @@ export default class App extends React.Component {
     <Content>
         <Route path="/" exact component={ Home }></Route>
         <Route path="/home" component={ Home }></Route>
-        <Route path="/details/:id" component={ Details } ></Route>
-        <Route path="/about" component={ About }></Route>
+        <Route path="/details/song/:id" component={ songDetail } ></Route>
+        <Route path="/details/album/:id" component={ albumDetails } ></Route>
+        <Route path="/details/songList/:id" component={ songListDetail } ></Route>
+        <Route path="/search" component={ Search }></Route>
     </Content>
     <Footer style={{ textAlign: 'center',background: '#333', color: '#fff' }}> ©2019 Created by lint </Footer>
   </Layout>

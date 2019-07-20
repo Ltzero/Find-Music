@@ -1,6 +1,6 @@
 import React from 'react'
 
-import styles from './mainBlock.scss'
+import styles from './songDetail.scss'
 import { Button, Divider, notification, Icon } from 'antd';
 import { store } from '@/store'
 
@@ -21,7 +21,7 @@ const openNotification = () => {
 
 
 
-export default class MainBlock extends React.Component {
+export default class SongDetail extends React.Component {
   constructor(props) {
       super(props)
       this.state = store.getState()
@@ -70,6 +70,7 @@ export default class MainBlock extends React.Component {
     return <section className={styles.wrap}>
       {this.state.songs.map( item => {
         return  <div key={item.id}><section className={styles.details}>
+         <div className={styles.tag}><span>单曲</span></div>
         <div className={styles.cover}>
           <img src={item.al.picUrl} alt={item.name}/>
         </div>

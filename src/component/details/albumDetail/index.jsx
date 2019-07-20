@@ -1,8 +1,8 @@
 import React from 'react'
 
-import MainBlock from './mainBlock'
+import AlbumDetail from './albumDetail'
 
-export default class Details extends React.Component {
+export default class AlbumDetailsWrap extends React.Component {
   constructor(props){
     super(props)
     this.state = {
@@ -11,7 +11,7 @@ export default class Details extends React.Component {
   }
   render() {
     return <section style={{margin: '0 10%', background: '#FFF'}}>
-      <MainBlock id={this.state.id}></MainBlock>
+      <AlbumDetail id={this.state.id}></AlbumDetail>
     </section>
   } 
 }
