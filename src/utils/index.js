@@ -51,3 +51,108 @@ export const objectArrayConcatAndRemoveDuplicate = (array1, array2) => {
   }
   return newArray
 }
+
+// 处理各种播放模式下切换播放歌曲或者歌曲播放完后的函数方法
+
+export const handlePlayerChangeOrMusicEnded = (type) => {
+  let PA1, PA2, PA3 = null
+  if(type ==='next' || type === 'ended') {
+    PA1 = this.state.myList.length - 1
+    PA2 = index-1
+    PA3 = this.state.myList.length - 1
+  }
+  if(type === 'pre') {
+    PA1 = 0
+    PA2 = index - 1
+    PA3 = this.state.myList.length - 1
+  }
+
+  if(this.state.myList.length===0) return false
+  // 获取当前这首歌在列表的索引
+  const index = findIndexByKey(this.state.myList, 'id', this.state.audio.id )
+  // 是否有播放地址
+  // 顺序播放 单曲循环 列表循环 列表随机
+  switch(this.state.playMode) {
+    case 'single_cycle': 
+      this.refs.audio.load()
+      this.refs.audio.play()
+      break
+    case 'random_cycle':
+      const random = ~~(Math.random()*this.state.myList.length)
+      // 检测播放地址是否为空
+      if(this.state.myList[random].playUrl === '') {
+        const id = this.state.myList[random].id
+        this.getMusicUrl(id).then( data => {
+          const value = {
+            index: random,
+            playUrl: data
+          }
+          const action = addSongPlayUrlAction(value)
+          store.dispatch(action)
+          const changeAction = changePlayerMusicAction(this.state.myList[random])
+          store.dispatch(changeAction)
+        })
+      }
+      break
+    case 'list_order':
+      if(index === -1) console.log(err)
+      if(index === PA1) {
+        const action = switchMusicPlayerAction(false)
+        store.dispatch(action) 
+        // 前面已经没有了
+      } else {
+        console.log(PA2)
+        if(this.state.myList[PA2].playUrl === '') {
+          const id = this.state.myList[PA2].id
+          this.getMusicUrl(id).then( data => {
+            const value = {
+              index: PA2,
+              playUrl: data
+            }
+            const action = addSongPlayUrlAction(value)
+            store.dispatch(action)
+            const changeAction = changePlayerMusicAction(this.state.myList[PA2])
+            store.dispatch(changeAction)
+          })
+        } else {
+          const action = changePlayerMusicAction(this.state.myList[PA2])
+          store.dispatch(action)
+        }
+      }
+      break
+    case 'list_cycle':
+      if(index === -1) console.log(err)
+      if(index === PA1) {
+        if(this.state.myList[PA3].playUrl === '') {
+          const id = this.state.myList[PA3].id
+          this.getMusicUrl(id).then( data => {
+            const value = {
+              index: PA3,
+              playUrl: data
+            }
+            const action = addSongPlayUrlAction(value)
+            store.dispatch(action)
+            const changeAction = changePlayerMusicAction(this.state.myList[PA3])
+            store.dispatch(changeAction)
+          })
+        } else {
+          // 不为空直接拨
+          const action = changePlayerMusicAction(this.state.myList[PA3])
+          store.dispatch(action)
+        }
+      } else {
+        const id = this.state.myList[PA2].id
+        this.getMusicUrl(id).then( data => {
+          const value = {
+            index: PA2,
+            playUrl: data
+          }
+          const action = addSongPlayUrlAction(value)
+          store.dispatch(action)
+          const changeAction = changePlayerMusicAction(this.state.myList[PA2])
+          store.dispatch(changeAction)
+        })
+      }
+      break
+    }
+  }

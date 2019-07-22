@@ -103,6 +103,8 @@ export default class MusicPlayer extends React.Component {
               <div className={styles.currentTime}>
               { this.state.audio === '' ? '0:0' : formateDuration(this.state.currentTime) }
               </div>
+
+              <div className={ styles.prowrap} onClick={ (e) => { this.handleTouch(e) } }>
               <Progress
                 showInfo={false}
                 strokeColor={{
@@ -111,6 +113,9 @@ export default class MusicPlayer extends React.Component {
                 }}
                 percent={ this.state.audio ? this.state.progress : 0 }
               />
+              </div>
+
+           
               <div className={styles.totalTime}>
               { this.state.audio === '' ? '0:0' : formateDuration(this.state.audio.time) }
               </div>
@@ -123,16 +128,17 @@ export default class MusicPlayer extends React.Component {
                 <Button shape="circle" icon="step-forward" onClick={ this.changeMusic.bind(this, 'next')} ></Button>
               </div>
               <div className={styles.extend}>
-                <Button onClick={ this.changePlayerMode.bind(this, 'list_cycle') } >
-                  列表循环
-                </Button>
-                <Button onClick={ this.changePlayerMode.bind(this, 'single_cycle') } >
-                  单曲循环
-                </Button>
-                <Button onClick={ this.changePlayerMode.bind(this, 'list_order') } >
+               
+                <Button onClick={ this.changePlayerMode.bind(this, 'list_order') } className={ this.state.playMode === 'list_order'? styles.choose : ''}>
                   顺序播放
                 </Button>
-                <Button onClick={ this.changePlayerMode.bind(this, 'random_cycle') } >
+                <Button onClick={ this.changePlayerMode.bind(this, 'list_cycle') } className={ this.state.playMode === 'list_cycle'? styles.choose : ''}>
+                  列表循环
+                </Button>
+                <Button onClick={ this.changePlayerMode.bind(this, 'single_cycle') } className={ this.state.playMode === 'single_cycle'? styles.choose : ''}>
+                  单曲循环
+                </Button>
+                <Button onClick={ this.changePlayerMode.bind(this, 'random_cycle') } className={ this.state.playMode === 'random_cycle'? styles.choose : ''}>
                   随机播放
                 </Button>
               </div>
@@ -157,17 +163,30 @@ export default class MusicPlayer extends React.Component {
     store.dispatch(action)
   }
 
+  handleTouch(e){
+    let percent = ((~~(e.pageX-80))/240)
+    if(this.audio != '') {
+      const newTime = (this.state.audio.time * percent)/1000
+      this.refs.audio.currentTime = newTime
+    }
+  }
+
   changeMusic = option => {
     if(this.state.myList.length===0) {
       return false
     }
     // 地址为空先发请求
+    
+    if(option === 'next')
+    this.handleMusicEnded()
+
+    if(option === 'pre')
+    this.handleMusicPre()
 
 
 
-
-    const action = changeMusicOrderAction(option)
-    store.dispatch(action)
+    // const action = changeMusicOrderAction(option)
+    // store.dispatch(action)
   }
 
   changePlayerMode = mode => {
@@ -196,6 +215,103 @@ export default class MusicPlayer extends React.Component {
     const action = setPlayerProgressAction(this.refs.audio.currentTime)
     store.dispatch(action)
   }
+
+  handleMusicPre = () => {
+    if(this.state.myList.length===0) return false
+    // 获取当前这首歌在列表的索引
+    const index = findIndexByKey(this.state.myList, 'id', this.state.audio.id )
+    // 是否有播放地址
+    // 顺序播放 单曲循环 列表循环 列表随机
+    switch(this.state.playMode) {
+      case 'single_cycle': 
+        this.refs.audio.load()
+        this.refs.audio.play()
+        break
+      case 'random_cycle':
+        const random = ~~(Math.random()*this.state.myList.length)
+        // 检测播放地址是否为空
+        if(this.state.myList[random].playUrl === '') {
+          const id = this.state.myList[random].id
+          this.getMusicUrl(id).then( data => {
+            const value = {
+              index: random,
+              playUrl: data
+            }
+            const action = addSongPlayUrlAction(value)
+            store.dispatch(action)
+            const changeAction = changePlayerMusicAction(this.state.myList[random])
+            store.dispatch(changeAction)
+          })
+        }
+        break
+      case 'list_order':
+        // let index = findIndexByKey(this.state.myList, 'id', this.state.audio.id )
+        if(index === -1) console.log(err)
+        if(index === 0) {
+          const action = switchMusicPlayerAction(false)
+          store.dispatch(action) 
+          // 前面已经没有了
+        } else {
+          if(this.state.myList[index-1].playUrl === '') {
+            const id = this.state.myList[index-1].id
+            this.getMusicUrl(id).then( data => {
+              const value = {
+                index: index-1,
+                playUrl: data
+              }
+              const action = addSongPlayUrlAction(value)
+              store.dispatch(action)
+              const changeAction = changePlayerMusicAction(this.state.myList[index-1])
+              store.dispatch(changeAction)
+            })
+          } else {
+            const action = changePlayerMusicAction(this.state.myList[index-1])
+            store.dispatch(action)
+          }
+        }
+        break
+      case 'list_cycle':
+        // let index = findIndexByKey(this.state.myList, 'id', this.state.audio.id )
+        if(index === -1) console.log(err)
+        if(index === 0) {
+          if(this.state.myList[this.state.myList.length-1].playUrl === '') {
+            const id = this.state.myList[this.state.myList.length-1].id
+            this.getMusicUrl(id).then( data => {
+              const value = {
+                index: this.state.myList.length-1,
+                playUrl: data
+              }
+              const action = addSongPlayUrlAction(value)
+              store.dispatch(action)
+              const changeAction = changePlayerMusicAction(this.state.myList[this.state.myList.length-1])
+              store.dispatch(changeAction)
+            })
+          } else {
+            // 不为空直接拨
+            const action = changePlayerMusicAction(this.state.myList[this.state.myList.length-1])
+            store.dispatch(action)
+          }
+        } else {
+          const id = this.state.myList[index-1].id
+          this.getMusicUrl(id).then( data => {
+            const value = {
+              index: index+1,
+              playUrl: data
+            }
+            const action = addSongPlayUrlAction(value)
+            store.dispatch(action)
+            const changeAction = changePlayerMusicAction(this.state.myList[index+1])
+            store.dispatch(changeAction)
+          })
+        }
+        break
+      }
+    }
+
+
+
+
+
 
   handleMusicEnded = () => {
     if(this.state.myList.length===0) return false

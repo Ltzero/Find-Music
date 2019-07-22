@@ -1,7 +1,7 @@
 import React from 'react'
 import styles from './lineBlock.scss'
-import { Card, Divider, Tag  } from 'antd';
-const { Meta } = Card;
+import { Divider, Tag  } from 'antd';
+import { Link } from 'react-router-dom'
 
 export default class LineBlock extends React.Component{
   constructor(props){
@@ -45,20 +45,26 @@ export default class LineBlock extends React.Component{
         else {
           return  <div className={styles.content} key={item.id}>
             <div className={styles.album}>
+              <Link to={"/details/songList/"+item.id}>
               <div className={styles.cover}>
-                <img src={item.creator.backgroundUrl} alt=""/>
+                <img src={item.coverImgUrl} alt=""/>
               </div>
+              </Link>
               <div className={styles.info}>
                 <div className={styles.titile}>
+                <Link to={"/details/songList/"+item.id}>
                   <span>{item.name}</span>
+                </Link>
                   <div>
                     { item.tags.map( tag => {
-                      return <Tag color="#f50" key={tag}>{tag}</Tag>
+                      return <Tag key={tag}>{tag}</Tag>
                     })}
                   </div>
                 </div>
                 <div className={styles.line}></div>
+                <Link to={"/details/songList/"+item.id}>
                 <p>{item.description}</p>
+                </Link>
               </div>
             </div>
          </div>

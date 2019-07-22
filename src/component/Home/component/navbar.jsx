@@ -2,7 +2,6 @@ import React from 'react'
 import styles from './navbar.scss'
 import { Icon, Affix } from 'antd'
 import { Link } from 'react-router-dom'
-import PropTypes from 'prop-types'
 import { withRouter } from 'react-router-dom'
 
 import { setSearchKeyAction } from '@/store/actionCreator'
@@ -18,12 +17,6 @@ class Navbar extends React.Component {
   handleStoreChange = () => {
     this.setState(store.getState())
   }
-
-  // static propTypes = {
-  //   match: PropTypes.object.isRequired,
-  //   location: PropTypes.object.isRequired,
-  //   history: PropTypes.object.isRequired
-  // }
 
   componentWillUnmount(){
     this.setState = (state,callback)=>{
