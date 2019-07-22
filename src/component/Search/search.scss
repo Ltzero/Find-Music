@@ -59,5 +59,80 @@
     min-height: 400px;
     // background: #457374;
     padding: 30px 5%;
+    .songsPannel {
+      background: #fff;
+    }
+    .songListPannel{
+      display: flex;
+      flex-wrap: wrap;
+      background: #fff;
+      justify-content: space-around;
+      .songList {
+        width: 18%;
+        margin: 0 15px 15px 0;       
+      }
+
+    }
+    .albumPannel{
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-around;
+      background: #fff;
+      .albumItem {
+        width: 18%;
+        margin: 0 0 20px 0;
+        border-radius: 30px;
+        .cover {
+          position: relative;
+          width: 100%;
+          text-align: center;
+          display: flex;
+          justify-content: center;
+          padding: 20px 0 10px 0;
+          img {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            border: 1px solid #e7e7e7;
+          }
+          span {
+            display: block;
+            height: 30px;
+            width: 30px;
+            background: transparent;
+            border: 2px solid #C9C9C9 ;
+            border-radius: 50%;
+            position: absolute;
+            top: 65px;
+          }
+        }
+        .info {
+          display: flex;
+          flex-wrap: wrap;
+          justify-content: center;
+          padding-left: 10px;
+          text-align: center;
+          .title {
+            width: 100%;
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            word-wrap: normal;
+          }
+          .description {
+            width: 100%;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            word-wrap: normal;
+            color: #898989;
+            font-size: 12px;
+          }
+        }
+
+      }
+    }
   }
 }

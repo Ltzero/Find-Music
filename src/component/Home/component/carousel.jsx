@@ -62,7 +62,7 @@ export default class homeCarousel extends React.Component {
                   {
                     item.targetType === '1' 
                     ? <Link to={ '/details/song/'+item.targetId }><img src={item.picUrl} alt={item.targetId}/></Link>
-                    : <img src={item.picUrl} alt={item.targetId}/>
+                    : item.targetType === '10' ?  <Link to={ '/details/album/'+item.targetId }><img src={item.picUrl} alt={item.targetId}/></Link> : <img src={item.picUrl} alt={item.targetId}/>
                   }
                 </div>
               </div>

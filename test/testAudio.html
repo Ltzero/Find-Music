@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+</head>
+<body>
+  <audio autoplay="true" src="" id="player" ></audio>
+</body>
+<script>
+ window.onload = function() {
+    const audio = document.getElementById('player')
+    audio.autoplay = true;
+    audio.controls = true;
+    audio.addEventListener("loadstart", function () {     //当浏览器开始寻找指定的音频/视频时，会发生 loadstart 事件。即当加载过程开始时
+        console.log(audio.src)
+    });
+ }
+
+</script>
+
+</html>

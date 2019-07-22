@@ -5,21 +5,19 @@ import { Button, Divider, notification, Icon, Tag, Table } from 'antd';
 import { store } from '@/store'
 import { Link } from 'react-router-dom'
 
-import { getSongListDetailsAction, computedLrcAction, getLrcAction, addToMyListAction, switchMusicPlayerAction, changePlayerMusicAction, openMusicListAction } from '@/store/actionCreator'
+import { getSongListDetailsAction, addSongListToMyListAction, switchMusicPlayerAction, openMusicListAction } from '@/store/actionCreator'
 
 import { separateSingers, formateDuration } from '@/utils'
 
-// const openNotification = () => {
-//   const args = {
-//     message: '提示',
-//     description:
-//       '该歌曲由于未bei知ban原因le不可播放,试试别的吧~',
-//     icon: <Icon type="smile" style={{ color: '#F0CF61' }} />
-//   }
-//   notification.open(args)
-// }
-
-
+const openNotification = () => {
+  const args = {
+    message: '提示',
+    description:
+      '该歌曲由于未bei知ban原因le不可播放,试试别的吧~',
+    icon: <Icon type="smile" style={{ color: '#F0CF61' }} />
+  }
+  notification.open(args)
+}
 
 
 export default class SongListDetail extends React.Component {
@@ -53,7 +51,7 @@ export default class SongListDetail extends React.Component {
      }
    }
 
-  // // 获取歌曲详情
+  // 获取歌曲列表详情
   getSongListDetails(id) {
     const url = 'https://v1.itooi.cn/netease/songList?id='+id
     fetch(url)
@@ -84,7 +82,6 @@ export default class SongListDetail extends React.Component {
       {
         title: '歌手',
         dataIndex: 'artists',
-        width: 300,
         key: 'artists',
         render: artists => separateSingers(artists)
       },
@@ -92,7 +89,7 @@ export default class SongListDetail extends React.Component {
         title: '专辑',
         dataIndex: 'album',
         key: 'album',
-        render: album => album.name
+        render: album =>  <Link to={'/details/album/' + album.id } >{album.name}</Link> 
       },
       {
         title: '时长',
@@ -106,7 +103,7 @@ export default class SongListDetail extends React.Component {
 
 
     return <section className={styles.wrap}>
-      <div className={styles.tag}><span>歌单</span></div>
+      <div className={styles.sort}><span>歌单</span></div>
       <section className={styles.details}>
         
         <div className={styles.cover}>
@@ -115,9 +112,12 @@ export default class SongListDetail extends React.Component {
         <div className={styles.info}>
           <div className={styles.title}>
             <h3>{this.state.songList.name}</h3>
-            <p>介绍:{ this.state.songList.description}</p>
+            <div className={styles.tags}>{ this.state.songList.tags &&  this.state.songList.tags.map( (item,index) => {
+              return <Tag key={index}> {item} </Tag>  
+            })  }</div>
             <div>
-              {/* <Button  icon="caret-right" onClick={this.playMusic}>播放</Button> */}
+            <p><span style={{ paddingRight: '15px'}}>简介:</span>{ this.state.songList.description}</p>
+              <Button  icon="caret-right" onClick={this.playMusic}>一键播放</Button>
             </div>
           </div>
 
@@ -135,17 +135,14 @@ export default class SongListDetail extends React.Component {
 
 
       <section className={styles.songs}>
+        <Divider style={{ color: '#888'}}>共收录{ this.state.songList.trackCount && this.state.songList.trackCount }首歌</Divider>
         <div className={styles.list}>
         <Table 
           columns={columns} 
-          // showTotal={total => `Total ${total} items`}
           pagination={{
-            pageSize: 20,
-            total: this.state.songList.trackCount,
-            // showTotal: this.
+            pageSize: 20
           }}
           rowKey={ record => record.id }
-          //   showHeader={false}
           dataSource={this.state.songList.tracks}
           //   onRow={ this.handleOnRow }
          />
@@ -175,36 +172,57 @@ export default class SongListDetail extends React.Component {
 //   }
 
 //   // 添加到列表并播放
-//   playMusic = () => {
-//     this.getMusicUrl(this.props.id).then( data => {
-//       this.addToList(data)
+  playMusic = () => {
 
-//       const action1 = switchMusicPlayerAction(true)
-//       store.dispatch(action1)
+    this.getMusicUrl(this.state.songList.tracks[0].id).then( data => {
+      let songList =  this.arrangeList(this.state.songList.tracks)
+      // 顺序问题？
+      songList[0].playUrl = data
+      const action = addSongListToMyListAction(songList)
+      store.dispatch(action)
+    })
+    const action1 = switchMusicPlayerAction(true)
+    store.dispatch(action1)
+    const action2 = openMusicListAction(true)
+    store.dispatch(action2)
+  }
 
-//       const action2 = openMusicListAction(true)
-//       store.dispatch(action2)
-//     })
-//   }
+  arrangeList(list) {
+    const songList = []
+    list.map( k => {
+      const singer = separateSingers(k.artists)
+      const Item = {
+        id: k.id,
+        name: k.name,
+        singer,
+        time: k.duration,
+        cover: k.album.picUrl,
+        playUrl: ''
+      }
+      songList.push(Item)
+    })
+    return songList
+  }
 
-//   getMusicUrl(id) {
-//     return new Promise((resolve, reject) => {
-//       const url = `https://v1.itooi.cn/netease/url?id=${id}&quality=flac`
-//       fetch(url)
-//       .then((response) => {
-//         if(response.status === 200){
-//           return response.url
-//         } else {
-//           // 请求地址失败 一般403 
-//           openNotification()
-//           reject()
-//         }
-//       })
-//       .then((data) => {
-//         resolve(data)
-//       })
-//     })
-//   }
+
+  getMusicUrl(id) {
+    return new Promise((resolve, reject) => {
+      const url = `https://v1.itooi.cn/netease/url?id=${id}&quality=flac`
+      fetch(url)
+      .then((response) => {
+        if(response.status === 200){
+          return response.url
+        } else {
+          // 请求地址失败 一般403 
+          openNotification()
+          reject()
+        }
+      })
+      .then((data) => {
+        resolve(data)
+      })
+    })
+  }
 
 //   getLrc(id) {
 //     return new Promise((resolve, reject) => {

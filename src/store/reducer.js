@@ -1,6 +1,6 @@
 // 引入actiontypes
-import { GET_SONG_DETAILS, GET_LRC, COMPUTED_LRC, ADD_TO_MY_LIST, OPEN_MUSIC_LIST, CLOSE_MUSIC_LIST, SWITCH_MUSIC_PLAYER, CHANGE_PLAYER_MUSIC, SET_PLAYER_PROGRESS, REMOVE_FROM_MY_LIST, CHANGE_MUSIC_ORDER, CHANGE_PLAYER_MODE, SEARCH_SINGLE_MUSIC, GET_SONG_LIST_DETAILS } from './actionTypes'
-
+import { GET_SONG_DETAILS, GET_LRC, COMPUTED_LRC, ADD_TO_MY_LIST, OPEN_MUSIC_LIST, CLOSE_MUSIC_LIST, SWITCH_MUSIC_PLAYER, CHANGE_PLAYER_MUSIC, SET_PLAYER_PROGRESS, REMOVE_FROM_MY_LIST, CHANGE_MUSIC_ORDER, CHANGE_PLAYER_MODE, SEARCH_SINGLE_MUSIC, GET_SONG_LIST_DETAILS, ADD_SONG_LIST_TO_MY_LIST, ADD_SONG_PLAY_URL, SET_SEARCH_KEY, SEARCH_SONG_LISTS, GET_ALBUM_DETAILS,SEARCH_ALBUM } from './actionTypes'
+import { objectArrayConcatAndRemoveDuplicate } from '@/utils' 
 
 // 给数据赋初值用于第一次渲染
 const defaultState = {
@@ -11,6 +11,7 @@ const defaultState = {
   currentTime: 0,
   progress: 0,
   audio: '',
+  searchKey: '',
   playMode: 'list_order',
   // 歌曲详情
   flag: false,
@@ -19,8 +20,12 @@ const defaultState = {
   comptedLrc: [],
   // 歌单详情
   songList: [],
+  // 专辑详情
+  albumList: [],
   // 搜索页state
-  singerList: []
+  singleList: [],
+  songLists: [],  //此处为搜索页的歌单集合和songList不同
+  albumLists: []
 }
 // 暴露一个纯函数reducer
 export const reducer = (state = defaultState , action) => {
@@ -40,6 +45,13 @@ export const reducer = (state = defaultState , action) => {
           return item.id === action.value.id
         })
         isRepeat || newState.myList.push(action.value)
+        return newState
+    case ADD_SONG_LIST_TO_MY_LIST:
+        newState.myList = objectArrayConcatAndRemoveDuplicate(newState.myList, action.value)
+        newState.audio = newState.myList[0]
+        return newState
+    case ADD_SONG_PLAY_URL:
+        newState.myList[action.value.index].playUrl = action.value.playUrl
         return newState
     case REMOVE_FROM_MY_LIST:
         // 删除的是否为正在播放的内容
@@ -67,7 +79,10 @@ export const reducer = (state = defaultState , action) => {
     case GET_SONG_LIST_DETAILS:
         newState.songList = action.value
         return newState
-
+        // 专辑
+    case GET_ALBUM_DETAILS:
+         newState.albumList = action.value
+         return newState
     case OPEN_MUSIC_LIST:
         newState.visible = action.value
         return newState
@@ -115,7 +130,7 @@ export const reducer = (state = defaultState , action) => {
         newState.playMode = action.value
         return newState
     case SEARCH_SINGLE_MUSIC:
-        newState.singerList = action.value
+        newState.singleList = action.value
         // const Param = {
         //   id: 'id',
         //   name: '歌曲名',
@@ -124,6 +139,15 @@ export const reducer = (state = defaultState , action) => {
         //   time: '时长'
         // }
         return newState    
+    case SET_SEARCH_KEY:
+        newState.searchKey = action.value    
+        return newState
+    case SEARCH_SONG_LISTS:
+        newState.songLists = action.value
+        return newState   
+    case SEARCH_ALBUM:
+        newState.albumLists = action.value
+        return newState
     default:
       return state
   }

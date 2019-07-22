@@ -1,22 +1,23 @@
 import React from 'react'
 
 import styles from './albumDetail.scss'
-import { Button, Divider, notification, Icon } from 'antd';
+import { Button, Divider, notification, Icon, Tag, Table } from 'antd';
 import { store } from '@/store'
+import { Link } from 'react-router-dom'
 
-import { getSongDetailsAction, computedLrcAction, getLrcAction, addToMyListAction, switchMusicPlayerAction, changePlayerMusicAction, openMusicListAction } from '@/store/actionCreator'
+import { getAlbumDetailsAction, switchMusicPlayerAction, addSongListToMyListAction, openMusicListAction } from '@/store/actionCreator'
 
-import { separateSingers } from '@/utils'
+import { separateSingers, formateDuration } from '@/utils'
 
-// const openNotification = () => {
-//   const args = {
-//     message: '提示',
-//     description:
-//       '该歌曲由于未bei知ban原因le不可播放,试试别的吧~',
-//     icon: <Icon type="smile" style={{ color: '#F0CF61' }} />
-//   }
-//   notification.open(args)
-// }
+const openNotification = () => {
+  const args = {
+    message: '提示',
+    description:
+      '该歌曲由于未bei知ban原因le不可播放,试试别的吧~',
+    icon: <Icon type="smile" style={{ color: '#F0CF61' }} />
+  }
+  notification.open(args)
+}
 
 
 
@@ -24,81 +25,107 @@ import { separateSingers } from '@/utils'
 export default class AlbumDetail extends React.Component {
   constructor(props) {
       super(props)
-      // this.state = store.getState()
+      this.state = store.getState()
       // 订阅store中内容的变化执行监听回掉
-      // store.subscribe(this.handleStoreChange)
+      store.subscribe(this.handleStoreChange)
   }
 
-  // handleStoreChange = () => {
-  //   // 从store中获取最新的数据并更新数据
-  //   this.setState(store.getState())
-  // }
+  handleStoreChange = () => {
+    this.setState(store.getState())
+  }
 
 
-  // componentDidMount() {
-  //   this.getSongDetails(this.props.id)
-  //   this.getLrc(this.props.id).then( () => {
-  //     const comLrc = this.computedLrc()
-  //     const action = computedLrcAction(comLrc)
-  //     store.dispatch(action) 
-  //   })
-  // }
+  componentDidMount() {
+    this.getSongDetails(this.props.id)
+  }
 
-  // componentWillUnmount(){
-  //   this.setState = (state,callback)=>{
-  //    return
-  //    }
-  //  }
+  componentWillUnmount(){
+    this.setState = (state,callback)=>{
+     return
+     }
+   }
 
   // // 获取歌曲详情
-  // getSongDetails(id) {
-  //   const url = 'https://v1.itooi.cn/netease/song?id='+id
-  //   fetch(url)
-  //     .then((response) => {
-  //       if(response.status === 200)
-  //       return response.json()
-  //     })
-  //     .then((data) => {
-  //       // 编写action
-  //       const action = getSongDetailsAction(data.data.songs)
-  //       store.dispatch(action)
-  //     })
-  // }
+  getSongDetails(id) {
+    const url = 'https://v1.itooi.cn/netease/album?id='+id
+    fetch(url)
+      .then((response) => {
+        if(response.status === 200)
+        return response.json()
+      })
+      .then((data) => {
+        // 编写action
+        console.log(data)
+        const action = getAlbumDetailsAction(data.data)
+        store.dispatch(action)
+      })
+  }
 
 
   render() {
+    const columns = [
+      {
+        title: '标题',
+        dataIndex: 'name',
+        key: 'name',
+        width: 250,
+        render: (text, record) => (
+          <Link to={'/details/song/'+record.id} >{text}</Link>
+        )    
+      },
+      {
+        title: '歌手',
+        dataIndex: 'ar',
+        key: 'ar',
+        render: ar => separateSingers(ar)
+      },
+      {
+        title: '时长',
+        dataIndex: 'dt',
+        width: 100,
+        key: 'dt',
+        render: dt => formateDuration(dt)
+      }
+    ]
     return <section className={styles.wrap}>
-      {/* {this.state.songs.map( item => {
-        return  <div key={item.id}><section className={styles.details}>
-        <div className={styles.cover}>
-          <img src={item.al.picUrl} alt={item.name}/>
-        </div>
-        <div className={styles.info}>
+      <div className={styles.sort}><span>专辑</span></div>
+      {  this.state.albumList.album && 
+      <section className={styles.details}>
+          <div className={styles.cover}>
+            <img src={this.state.albumList.album.picUrl} alt={this.state.albumList.album.name}/>
+          </div>
+          <div className={styles.info}>
           <div className={styles.title}>
-            <h3>{item.name}</h3>
-            <p>歌手名: <a>{item.ar[0].name}</a></p>
-            <p>所属专辑: <a>{item.al.name}</a></p>
+            <h3>{this.state.albumList.album.name}</h3>
+            <div className={styles.tags}>{ this.state.albumList.album.tags &&  this.state.albumList.album.tags.map( (item,index) => {
+              return <Tag key={index}> {item} </Tag>  
+            })  }</div>
             <div>
-              <Button  icon="caret-right" onClick={this.playMusic}>播放</Button>
+            <p><span style={{ paddingRight: '15px'}}>简介:</span>{ this.state.albumList.album.description}</p>
+              <Button  icon="caret-right" onClick={this.playMusic}>一键播放</Button>
             </div>
           </div>
-          <div className={styles.lyrics}>
-            <div className={styles.content} ref="lrc">
-            <Divider style={{ color: '#62BFAD'}}>歌词</Divider>
-              { this.state.comptedLrc.map(( line,index) => {
-                return <p key={index}>{line}</p>  
-              }) }
-            </div>
-            <a onClick={this.toggleLrc} ref="toggle">展开</a>
           </div>
-        </div>
       </section> 
-      </div>
-      })}
-      <section className={styles.recommend}>
-        <div className={styles.list}></div>
-      </section> */}
-    </section>
+    }
+
+    {this.state.albumList.songs && 
+      <section className={styles.songs}>
+        <Divider style={{ color: '#888'}}>共收录{ this.state.albumList.songs.length }首歌</Divider>
+        <div className={styles.list}>
+        <Table 
+          columns={columns} 
+          pagination={{
+            pageSize: 20
+          }}
+          rowKey={ record => record.id }
+          dataSource={this.state.albumList.songs}
+            // onRow={ this.handleOnRow }
+         />
+        </div>
+      </section>}
+    </section>    
+
   }
 
 //   addToList(url) {
@@ -122,77 +149,52 @@ export default class AlbumDetail extends React.Component {
 //   }
 
 //   // 添加到列表并播放
-//   playMusic = () => {
-//     this.getMusicUrl(this.props.id).then( data => {
-//       this.addToList(data)
+  playMusic = () => {
+    this.getMusicUrl(this.state.albumList.songs[0].id).then( data => {
+      let songList =  this.arrangeList(this.state.albumList.songs)
+      songList[0].playUrl = data
+      const action = addSongListToMyListAction(songList)
+      store.dispatch(action)
+    })
+    const action1 = switchMusicPlayerAction(true)
+    store.dispatch(action1)
+    const action2 = openMusicListAction(true)
+    store.dispatch(action2)
+  }
 
-//       const action1 = switchMusicPlayerAction(true)
-//       store.dispatch(action1)
+  arrangeList(list) {
+    const songList = []
+    list.map( k => {
+      const singer = separateSingers(k.ar)
+      const Item = {
+        id: k.id,
+        name: k.name,
+        singer,
+        time: k.dt,
+        cover: k.al.picUrl,
+        playUrl: ''
+      }
+      songList.push(Item)
+    })
+    return songList
+  }
 
-//       const action2 = openMusicListAction(true)
-//       store.dispatch(action2)
-//     })
-//   }
-
-//   getMusicUrl(id) {
-//     return new Promise((resolve, reject) => {
-//       const url = `https://v1.itooi.cn/netease/url?id=${id}&quality=flac`
-//       fetch(url)
-//       .then((response) => {
-//         if(response.status === 200){
-//           return response.url
-//         } else {
-//           // 请求地址失败 一般403 
-//           openNotification()
-//           reject()
-//         }
-//       })
-//       .then((data) => {
-//         resolve(data)
-//       })
-//     })
-//   }
-
-//   getLrc(id) {
-//     return new Promise((resolve, reject) => {
-//       const url = 'https://v1.itooi.cn/netease/lrc?id='+id
-//       fetch(url)
-//       .then((response) => {
-//         if(response.status === 200)
-//         return response.text()
-//       })
-//       .then((data) => {
-//         const action = getLrcAction(data)
-//         store.dispatch(action)
-//         resolve()
-//       })
-//     })
-//   }
-
-//   // 展开歌词列表
-//   toggleLrc = () => {
-//     if(this.state.flag) {
-//       this.refs.lrc.style.height = '300px'
-//       this.setState({
-//         flag: !this.state.flag
-//       })
-//       this.refs.toggle.innerHTML = '展开'
-//     } else {
-//       this.refs.lrc.style.height = 'auto'
-//       this.setState({
-//         flag: !this.state.flag
-//       })
-//       this.refs.toggle.innerHTML = '收起'
-//     }
-//   }
-
-// computedLrc() {
-//     const lrc = this.state.lrc
-//     const compLrc = []
-//     lrc.split('\n').forEach(item => {
-//       compLrc.push(item.replace(/\[.*\]/, ''))
-//     })
-//     compLrc.shift()
-//     return compLrc
-//   }
+  getMusicUrl(id) {
+    return new Promise((resolve, reject) => {
+      const url = `https://v1.itooi.cn/netease/url?id=${id}&quality=flac`
+      fetch(url)
+      .then((response) => {
+        if(response.status === 200){
+          return response.url
+        } else {
+          // 请求地址失败 一般403 
+          openNotification()
+          reject()
+        }
+      })
+      .then((data) => {
+        resolve(data)
+      })
+    })
+  }
 }

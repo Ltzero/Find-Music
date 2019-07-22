@@ -6,6 +6,10 @@ export const COMPUTED_LRC = 'computed_lrc'
 export const ADD_TO_MY_LIST = 'add_to_my_list'
 // -- songList
 export const GET_SONG_LIST_DETAILS = 'get_song_list_details'
+export const ADD_SONG_LIST_TO_MY_LIST = 'add_song_list_to_my_list'
+export const ADD_SONG_PLAY_URL = 'add_song_play_url'
+// 
+export const GET_ALBUM_DETAILS = 'get_album_details'
 
 
 // music player
@@ -20,3 +24,6 @@ export const CHANGE_PLAYER_MODE = 'change_player_mode'
 
 // search
 export const SEARCH_SINGLE_MUSIC = 'search_single_music'
+export const SET_SEARCH_KEY = 'set_search_key'
+export const SEARCH_SONG_LISTS = 'search_song_lists'
+export const SEARCH_ALBUM = 'search_album'

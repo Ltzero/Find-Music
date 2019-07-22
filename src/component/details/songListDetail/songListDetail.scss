@@ -3,7 +3,7 @@
   flex-direction: column;
   position: relative;
   overflow: hidden;
-  .tag{
+  .sort{
     height: 100px;
     width: 100px;
     background: rgba(238, 34, 51, 0.47); 
@@ -51,7 +51,14 @@
         }
         p {
           color: #999;
+          padding-right: 30px;
         }
+      }
+      .tags {
+        margin-bottom: 12px;
+      }
+      p {
+        margin-bottom: 25px;
       }
       .lyrics {
         margin-top: 30px;
@@ -66,8 +73,6 @@
   }
   .songs{
     width: 100%;
-    padding: 0;
-    .list{
-    }
+    padding: 20px;
   }
 }

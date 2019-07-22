@@ -5,12 +5,18 @@ import { Link } from 'react-router-dom'
 import PropTypes from 'prop-types'
 import { withRouter } from 'react-router-dom'
 
+import { setSearchKeyAction } from '@/store/actionCreator'
+import { store } from '@/store'
+
 class Navbar extends React.Component {
   constructor(props) {
       super(props)
-      this.state={
-        top: 0
-      }
+      this.state = store.getState()
+      store.subscribe(this.handleStoreChange)
+  }
+
+  handleStoreChange = () => {
+    this.setState(store.getState())
   }
 
   // static propTypes = {
@@ -19,8 +25,14 @@ class Navbar extends React.Component {
   //   history: PropTypes.object.isRequired
   // }
 
+  componentWillUnmount(){
+    this.setState = (state,callback)=>{
+     return
+     }
+  }
+
   render() {
-    return <Affix offsetTop={this.state.top}>
+    return <Affix offsetTop={0}>
       <div className={styles.nav}>
       <ul className={styles.list}>
       <div className={styles.logo}>
@@ -42,7 +54,8 @@ class Navbar extends React.Component {
   handleSearch = () => {
     const key = this.refs.enter.value
     this.props.history.push({pathname : '/search', state:{key}})
-    
+    const action = setSearchKeyAction(key)
+    store.dispatch(action)
   }
 }
 

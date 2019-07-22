@@ -3,11 +3,19 @@ import React from 'react'
 import styles from './musicPlayer.scss'
 import { Drawer, Table, Icon, Progress, Button } from 'antd'
 import { store } from '@/store/'
-import { openMusicListAction, closeMusicListAction, switchMusicPlayerAction, setPlayerProgressAction, removeFromMyListAction, changeMusicOrderAction, changePlayerMusicAction, changePlayerModeAction } from '@/store/actionCreator'
+import { openMusicListAction, closeMusicListAction, switchMusicPlayerAction, setPlayerProgressAction, removeFromMyListAction, changeMusicOrderAction, changePlayerMusicAction, changePlayerModeAction, addSongPlayUrlAction } from '@/store/actionCreator'
 
 import { formateDuration, findIndexByKey } from '@/utils'
 
-
+const openNotification = () => {
+  const args = {
+    message: '提示',
+    description:
+      '该歌曲由于未bei知ban原因le不可播放,试试别的吧~',
+    icon: <Icon type="smile" style={{ color: '#F0CF61' }} />
+  }
+  notification.open(args)
+}
 
 export default class MusicPlayer extends React.Component {
 
@@ -153,6 +161,11 @@ export default class MusicPlayer extends React.Component {
     if(this.state.myList.length===0) {
       return false
     }
+    // 地址为空先发请求
+
+
+
+
     const action = changeMusicOrderAction(option)
     store.dispatch(action)
   }
@@ -186,7 +199,9 @@ export default class MusicPlayer extends React.Component {
 
   handleMusicEnded = () => {
     if(this.state.myList.length===0) return false
+    // 获取当前这首歌在列表的索引
     const index = findIndexByKey(this.state.myList, 'id', this.state.audio.id )
+    // 是否有播放地址
     // 顺序播放 单曲循环 列表循环 列表随机
     switch(this.state.playMode) {
       case 'single_cycle': 
@@ -195,8 +210,20 @@ export default class MusicPlayer extends React.Component {
         break
       case 'random_cycle':
         const random = ~~(Math.random()*this.state.myList.length)
-        const action = changePlayerMusicAction(this.state.myList[random])
-        store.dispatch(action)
+        // 检测播放地址是否为空
+        if(this.state.myList[random].playUrl === '') {
+          const id = this.state.myList[random].id
+          this.getMusicUrl(id).then( data => {
+            const value = {
+              index: random,
+              playUrl: data
+            }
+            const action = addSongPlayUrlAction(value)
+            store.dispatch(action)
+            const changeAction = changePlayerMusicAction(this.state.myList[random])
+            store.dispatch(changeAction)
+          })
+        }
         break
       case 'list_order':
         // let index = findIndexByKey(this.state.myList, 'id', this.state.audio.id )
@@ -205,25 +232,81 @@ export default class MusicPlayer extends React.Component {
           const action = switchMusicPlayerAction(false)
           store.dispatch(action) 
         } else {
-          const action = changePlayerMusicAction(this.state.myList[index+1])
-          store.dispatch(action)
+          if(this.state.myList[index+1].playUrl === '') {
+            const id = this.state.myList[index+1].id
+            this.getMusicUrl(id).then( data => {
+              const value = {
+                index: index+1,
+                playUrl: data
+              }
+              const action = addSongPlayUrlAction(value)
+              store.dispatch(action)
+              const changeAction = changePlayerMusicAction(this.state.myList[index+1])
+              store.dispatch(changeAction)
+            })
+          } else {
+            const action = changePlayerMusicAction(this.state.myList[index+1])
+            store.dispatch(action)
+          }
         }
         break
       case 'list_cycle':
         // let index = findIndexByKey(this.state.myList, 'id', this.state.audio.id )
         if(index === -1) console.log(err)
-        // 是否会设置相同值
         if(index === this.state.myList.length-1) {
-          const action = changePlayerMusicAction(this.state.myList[0])
-          store.dispatch(action)
+          if(this.state.myList[0].playUrl === '') {
+            const id = this.state.myList[0].id
+            this.getMusicUrl(id).then( data => {
+              const value = {
+                index: 0,
+                playUrl: data
+              }
+              const action = addSongPlayUrlAction(value)
+              store.dispatch(action)
+              const changeAction = changePlayerMusicAction(this.state.myList[0])
+              store.dispatch(changeAction)
+            })
+          } else {
+            // 不为空直接拨
+            const action = changePlayerMusicAction(this.state.myList[0])
+            store.dispatch(action)
+          }
         } else {
-          const action = changePlayerMusicAction(this.state.myList[index+1])
-          store.dispatch(action)
+          const id = this.state.myList[index+1].id
+          this.getMusicUrl(id).then( data => {
+            const value = {
+              index: index+1,
+              playUrl: data
+            }
+            const action = addSongPlayUrlAction(value)
+            store.dispatch(action)
+            const changeAction = changePlayerMusicAction(this.state.myList[index+1])
+            store.dispatch(changeAction)
+          })
         }
         break
+      }
     }
-  }
+  
 
+  getMusicUrl(id) {
+    return new Promise((resolve, reject) => {
+      const url = `https://v1.itooi.cn/netease/url?id=${id}&quality=flac`
+      fetch(url)
+      .then((response) => {
+        if(response.status === 200){
+          return response.url
+        } else {
+          // 请求地址失败 一般403 
+          openNotification()
+          reject()
+        }
+      })
+      .then((data) => {
+        resolve(data)
+      })
+    })
+  }
 
   handleOnRow = record => {
     return {
