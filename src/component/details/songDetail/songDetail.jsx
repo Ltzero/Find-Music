@@ -5,7 +5,8 @@ import { Button, Divider, notification, Icon } from 'antd';
 import { store } from '@/store'
 
 import { getSongDetailsAction, computedLrcAction, getLrcAction, addToMyListAction, switchMusicPlayerAction, changePlayerMusicAction, openMusicListAction } from '@/store/actionCreator'
-
+import { Link } from 'react-router-dom'
+ 
 import { separateSingers } from '@/utils'
 
 const openNotification = () => {
@@ -77,8 +78,8 @@ export default class SongDetail extends React.Component {
         <div className={styles.info}>
           <div className={styles.title}>
             <h3>{item.name}</h3>
-            <p>歌手名: <a>{item.ar[0].name}</a></p>
-            <p>所属专辑: <a>{item.al.name}</a></p>
+            <p>歌手名: {item.ar[0].name}</p>
+            <p>所属专辑: <Link to={'/details/album/'+item.al.id}>{item.al.name}</Link></p>
             <div>
               <Button  icon="caret-right" onClick={this.playMusic}>播放</Button>
             </div>
