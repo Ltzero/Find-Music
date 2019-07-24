@@ -17,6 +17,15 @@ export const formateDuration = duration => {
   return `${ hours === 0 ? '' : hours + ':' }${minutes}:${secends}`
 }
 
+export const computedLrc = lrc => {
+  const computedLrc = []
+  lrc.split('\n').forEach(item => {
+    computedLrc.push(item.replace(/\[.*\]/, ''))
+  })
+  computedLrc.shift()
+  return computedLrc
+}
+
 export const getMusicInfo = (id, arry) => {
   const fid = id + 0
   console.log(fid)

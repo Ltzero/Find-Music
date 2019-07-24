@@ -1,19 +1,21 @@
 import React from 'react'
 import { HashRouter, Route } from 'react-router-dom'
 
-import Home from '@/component/home'
-import songDetail from '@/component/details/songDetail'
-import albumDetails from '@/component/details/albumDetail'
-import songListDetail from '@/component/details/songListDetail'
+// pages
+import Home from '@/views/pages/home'
+import Search from '@/views/pages/search'
+import songDetail from '@/views/pages/details/songDetail'
+import albumDetails from '@/views/pages/details/albumDetail'
+import songListDetail from '@/views/pages/details/songListDetail'
 
-import Search from '@/component/Search'
+// components
+import NavBar from '@/component/navbar' 
+import MusicPlayer from '@/component/musicPlayer'
 
-import 'antd/dist/antd.css';
-import { Layout } from 'antd';
-const { Content, Footer } = Layout;
-
-import NavBar from './component/Home/component/navbar' 
-import MusicPlayer from './component/MusicPlayer/musicplayer';
+// third part
+import 'antd/dist/antd.css'
+import { Layout } from 'antd'
+const { Content, Footer } = Layout
 
 export default class App extends React.Component {
   constructor(props) {

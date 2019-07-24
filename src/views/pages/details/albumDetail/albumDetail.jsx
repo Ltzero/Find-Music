@@ -1,26 +1,13 @@
 import React from 'react'
 
 import styles from './albumDetail.scss'
-import { Button, Divider, notification, Icon, Tag, Table } from 'antd';
+import { Button, Divider, Tag, Table } from 'antd';
 import { store } from '@/store'
 import { Link } from 'react-router-dom'
 
 import { getAlbumDetailsAction, switchMusicPlayerAction, addSongListToMyListAction, openMusicListAction } from '@/store/actionCreator'
-
 import { separateSingers, formateDuration } from '@/utils'
-
-const openNotification = () => {
-  const args = {
-    message: '提示',
-    description:
-      '该歌曲由于未bei知ban原因le不可播放,试试别的吧~',
-    icon: <Icon type="smile" style={{ color: '#F0CF61' }} />
-  }
-  notification.open(args)
-}
-
-
-
+import { getPlayUrlAPI, getAlbumDetailsAPI } from '@/api'
 
 export default class AlbumDetail extends React.Component {
   constructor(props) {
@@ -34,9 +21,8 @@ export default class AlbumDetail extends React.Component {
     this.setState(store.getState())
   }
 
-
   componentDidMount() {
-    this.getSongDetails(this.props.id)
+    this.getAlbumDetails(this.props.id)
   }
 
   componentWillUnmount(){
@@ -45,22 +31,13 @@ export default class AlbumDetail extends React.Component {
      }
    }
 
-  // // 获取歌曲详情
-  getSongDetails(id) {
-    const url = 'https://v1.itooi.cn/netease/album?id='+id
-    fetch(url)
-      .then((response) => {
-        if(response.status === 200)
-        return response.json()
-      })
-      .then((data) => {
-        // 编写action
-        console.log(data)
-        const action = getAlbumDetailsAction(data.data)
-        store.dispatch(action)
-      })
+  // 获取歌曲详情
+  getAlbumDetails(id) {
+    getAlbumDetailsAPI(id).then( Response => {
+      const action = getAlbumDetailsAction(Response.data)
+      store.dispatch(action)
+    })
   }
-
 
   render() {
     const columns = [
@@ -125,34 +102,13 @@ export default class AlbumDetail extends React.Component {
         </div>
       </section>}
     </section>    
-
   }
 
-//   addToList(url) {
-//     // 建立一个音乐粗略信息文本
-//     const songsData = this.state.songs[0]
-//     const singers = separateSingers(songsData.ar)
-//     const song = {
-//       id: songsData.id,
-//       name: songsData.name,
-//       singer: singers,
-//       time: songsData.dt,
-//       cover: songsData.al.picUrl,
-//       playUrl: url
-//     }
-//     const action1 = addToMyListAction(song)
-//     store.dispatch(action1)
-
-//     const action2 = changePlayerMusicAction(song)
-//     store.dispatch(action2)
-
-//   }
-
-//   // 添加到列表并播放
+  //添加到列表并播放
   playMusic = () => {
-    this.getMusicUrl(this.state.albumList.songs[0].id).then( data => {
+    getPlayUrlAPI(this.state.albumList.songs[0].id).then( Response => {
       let songList =  this.arrangeList(this.state.albumList.songs)
-      songList[0].playUrl = data
+      songList[0].playUrl = Response
       const action = addSongListToMyListAction(songList)
       store.dispatch(action)
     })
@@ -177,24 +133,5 @@ export default class AlbumDetail extends React.Component {
       songList.push(Item)
     })
     return songList
-  }
-
-  getMusicUrl(id) {
-    return new Promise((resolve, reject) => {
-      const url = `https://v1.itooi.cn/netease/url?id=${id}&quality=flac`
-      fetch(url)
-      .then((response) => {
-        if(response.status === 200){
-          return response.url
-        } else {
-          // 请求地址失败 一般403 
-          openNotification()
-          reject()
-        }
-      })
-      .then((data) => {
-        resolve(data)
-      })
-    })
   }
 }

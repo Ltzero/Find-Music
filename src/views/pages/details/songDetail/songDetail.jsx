@@ -7,42 +7,23 @@ import { store } from '@/store'
 import { getSongDetailsAction, computedLrcAction, getLrcAction, addToMyListAction, switchMusicPlayerAction, changePlayerMusicAction, openMusicListAction } from '@/store/actionCreator'
 import { Link } from 'react-router-dom'
  
-import { separateSingers } from '@/utils'
-
-const openNotification = () => {
-  const args = {
-    message: '提示',
-    description:
-      '该歌曲由于未bei知ban原因le不可播放,试试别的吧~',
-    icon: <Icon type="smile" style={{ color: '#F0CF61' }} />
-  }
-  notification.open(args)
-}
-
-
-
+import { separateSingers, computedLrc } from '@/utils'
+import { getSingleDetailsAPI, getMusicLrcAPI, getPlayUrlAPI  } from '@/api'
 
 export default class SongDetail extends React.Component {
   constructor(props) {
       super(props)
       this.state = store.getState()
-      // 订阅store中内容的变化执行监听回掉
       store.subscribe(this.handleStoreChange)
   }
 
   handleStoreChange = () => {
-    // 从store中获取最新的数据并更新数据
     this.setState(store.getState())
   }
 
-
   componentDidMount() {
     this.getSongDetails(this.props.id)
-    this.getLrc(this.props.id).then( () => {
-      const comLrc = this.computedLrc()
-      const action = computedLrcAction(comLrc)
-      store.dispatch(action) 
-    })
+    this.getLrc(this.props.id)
   }
 
   componentWillUnmount(){
@@ -53,24 +34,17 @@ export default class SongDetail extends React.Component {
 
   // 获取歌曲详情
   getSongDetails(id) {
-    const url = 'https://v1.itooi.cn/netease/song?id='+id
-    fetch(url)
-      .then((response) => {
-        if(response.status === 200)
-        return response.json()
-      })
-      .then((data) => {
-        // 编写action
-        const action = getSongDetailsAction(data.data.songs)
-        store.dispatch(action)
-      })
+    getSingleDetailsAPI(id).then( Response => {
+      const action = getSongDetailsAction(Response.data.songs)
+      store.dispatch(action)
+    })
   }
-
 
   render() {
     return <section className={styles.wrap}>
-      {this.state.songs.map( item => {
-        return  <div key={item.id}><section className={styles.details}>
+      {this.state.single.map( item => {
+        console.log(item)
+        return <section className={styles.details} key={item.id}>
          <div className={styles.tag}><span>单曲</span></div>
         <div className={styles.cover}>
           <img src={item.al.picUrl} alt={item.name}/>
@@ -79,7 +53,7 @@ export default class SongDetail extends React.Component {
           <div className={styles.title}>
             <h3>{item.name}</h3>
             <p>歌手名: {item.ar[0].name}</p>
-            <p>所属专辑: <Link to={'/details/album/'+item.al.id}>{item.al.name}</Link></p>
+            <p>所属专辑: <Link to={'/details/album/'+ item.al.id }>{item.al.name}</Link></p>
             <div>
               <Button  icon="caret-right" onClick={this.playMusic}>播放</Button>
             </div>
@@ -95,8 +69,7 @@ export default class SongDetail extends React.Component {
           </div>
         </div>
       </section> 
-      </div>
-      })}
+       })} 
       <section className={styles.recommend}>
         <div className={styles.list}></div>
       </section>
@@ -105,7 +78,7 @@ export default class SongDetail extends React.Component {
 
   addToList(url) {
     // 建立一个音乐粗略信息文本
-    const songsData = this.state.songs[0]
+    const songsData = this.state.single[0]
     const singers = separateSingers(songsData.ar)
     const song = {
       id: songsData.id,
@@ -117,57 +90,28 @@ export default class SongDetail extends React.Component {
     }
     const action1 = addToMyListAction(song)
     store.dispatch(action1)
-
     const action2 = changePlayerMusicAction(song)
     store.dispatch(action2)
-
   }
 
   // 添加到列表并播放
   playMusic = () => {
-    this.getMusicUrl(this.props.id).then( data => {
-      this.addToList(data)
-
+    getPlayUrlAPI(this.props.id).then( Response => {
+      this.addToList(Response)
       const action1 = switchMusicPlayerAction(true)
       store.dispatch(action1)
-
       const action2 = openMusicListAction(true)
       store.dispatch(action2)
     })
   }
 
-  getMusicUrl(id) {
-    return new Promise((resolve, reject) => {
-      const url = `https://v1.itooi.cn/netease/url?id=${id}&quality=flac`
-      fetch(url)
-      .then((response) => {
-        if(response.status === 200){
-          return response.url
-        } else {
-          // 请求地址失败 一般403 
-          openNotification()
-          reject()
-        }
-      })
-      .then((data) => {
-        resolve(data)
-      })
-    })
-  }
-
   getLrc(id) {
-    return new Promise((resolve, reject) => {
-      const url = 'https://v1.itooi.cn/netease/lrc?id='+id
-      fetch(url)
-      .then((response) => {
-        if(response.status === 200)
-        return response.text()
-      })
-      .then((data) => {
-        const action = getLrcAction(data)
-        store.dispatch(action)
-        resolve()
-      })
+    getMusicLrcAPI(id).then( Response => {
+      const copLrc = computedLrc(Response)
+      const getAction = getLrcAction(Response)
+      store.dispatch(getAction)
+      const comAction = computedLrcAction(copLrc)
+      store.dispatch(comAction) 
     })
   }
 
@@ -186,15 +130,5 @@ export default class SongDetail extends React.Component {
       })
       this.refs.toggle.innerHTML = '收起'
     }
-  }
-
-computedLrc() {
-    const lrc = this.state.lrc
-    const compLrc = []
-    lrc.split('\n').forEach(item => {
-      compLrc.push(item.replace(/\[.*\]/, ''))
-    })
-    compLrc.shift()
-    return compLrc
   }
 }

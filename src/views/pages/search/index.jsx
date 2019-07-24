@@ -1,6 +1,6 @@
 import React from 'react'
 import styles from './search.scss'
-import { Tag, Tabs, Table, Card  } from 'antd'
+import { Tabs, Table, Card  } from 'antd'
 import PropTypes from 'prop-types'
 
 import { store } from '@/store/'
@@ -8,6 +8,7 @@ import { searchSingleMusicAction, setSearchKeyAction, searchSongListsAction, sea
 import { Link } from 'react-router-dom'
 
 import { formateDuration, separateSingers } from '@/utils'
+import { findMusicAPI } from '@/api'
 
 const { TabPane } = Tabs
 const { Meta } = Card
@@ -36,7 +37,6 @@ export default class Search extends React.Component {
   static propTypes = {
     location: PropTypes.object.isRequired
   }
-
 
   render() {
     const columns = [
@@ -68,13 +68,13 @@ export default class Search extends React.Component {
         }
       ]
 
-      return (<section className={styles.search} >
+      return (<section className={styles.search}>
         <div className={styles.nav}>
           <div className={styles.bar}>
             <h1>Find music~</h1>
             <div className={styles.searcher}>
               <input type="text" ref="key" value={this.state.searchKey} onChange={ this.handleInputChange }/>
-              <span onClick={ this.searchMusic }>Go</span>    
+              <span onClick={ (e) => this.findMusic('song', 20, 0, e) }>Go</span>    
             </div>
           </div>
         </div>
@@ -134,51 +134,40 @@ export default class Search extends React.Component {
       </section>)
   }
 
-  findMusic = () => {
+  findMusic = (type = 'song', pageSize = 20, page = 0) => {
     if(this.state.searchKey === '') {
-        return false
+      return false
     }
-    const url = `https://v1.itooi.cn/netease/search?keyword=${this.state.searchKey}&type=song&pageSize=20&page=0`
-      fetch(url).then( response => {
-        return response.json()
-      }).then( data => {
-        const action = searchSingleMusicAction(data.data.songs)
-        store.dispatch(action)
-      })
-  }
-
-  // 搜索
-  searchMusic = (event, type = 'song', page = 0) =>{
-    console.log(type)
+    console.log( type )
+    console.log(pageSize )
     console.log(page)
-    const url = `https://v1.itooi.cn/netease/search?keyword=${this.state.searchKey}&type=${type}&pageSize=20&page=${page}`
-    console.log(url)
-    fetch(url).then( response => {
-      if(response.status === 200)
-      return response.json()
-    }).then( data => {
-      
+    const params = {
+      keyword: this.state.searchKey,
+      type: type,
+      pageSize: pageSize,
+      page: page
+    }
+    findMusicAPI(params).then( Response => {
       switch(type) {
         case 'song':
-          const singleAction = searchSingleMusicAction(data.data.songs)
+          const singleAction = searchSingleMusicAction(Response.data.songs)
           store.dispatch(singleAction)
           break
         case 'songList':
-          const listAction = searchSongListsAction(data.data.playlists)
+          const listAction = searchSongListsAction(Response.data.playlists)
           store.dispatch(listAction)
           break
         case 'album':
-          const albumAction = searchAlbumAction(data.data.albums)
+          const albumAction = searchAlbumAction(Response.data.albums)
           store.dispatch(albumAction)
       }
-    }) 
+    })
   }
 
   handleInputChange = (e) => {
     const action = setSearchKeyAction(e.target.value)
     store.dispatch(action)
   }
-
 
   changeTags = (index) => {
     if(this.state.searchKey==='')return false
@@ -194,6 +183,6 @@ export default class Search extends React.Component {
         mark = 'album'
         break
       }
-    this.searchMusic(null, mark, 0)
+    this.findMusic(mark)
   }
 }

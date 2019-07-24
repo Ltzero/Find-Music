@@ -15,7 +15,7 @@ const defaultState = {
   playMode: 'list_order',
   // 歌曲详情
   flag: false,
-  songs: [],
+  single: [],
   lrc: '',
   comptedLrc: [],
   // 歌单详情
@@ -32,7 +32,7 @@ export const reducer = (state = defaultState , action) => {
   const newState = JSON.parse(JSON.stringify(state))
   switch(action.type) {
     case GET_SONG_DETAILS:
-        newState.songs = action.value
+        newState.single = action.value
         return newState
     case GET_LRC:
         newState.lrc = action.value 

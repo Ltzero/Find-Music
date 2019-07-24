@@ -1,9 +1,10 @@
 import React from 'react'
-import styles from './lineBlock.scss'
+import styles from './describeList.scss'
 import { Divider, Tag  } from 'antd';
 import { Link } from 'react-router-dom'
-
-export default class LineBlock extends React.Component{
+import { getHighQualitySongListsAPI } from '@/api'
+ 
+export default class DescribeList extends React.Component{
   constructor(props){
     super(props)
     this.state = {
@@ -21,16 +22,14 @@ export default class LineBlock extends React.Component{
      }
   }
 
-  getHighQualitySongList(cat = '全部', pageSize = 4) {
-    const url = `https://v1.itooi.cn/netease/songList/highQuality?cat=${cat}&pageSize=${pageSize}`
-    fetch(url)
-    .then( response => {
-      return response.json()
-    })
-    .then( data => {
-      if(data.code===200)
+  getHighQualitySongList() {
+    const params = {
+      cat: '全部',
+      pageSize: 4
+    }
+    getHighQualitySongListsAPI(params).then( Response => {
       this.setState({
-        albumList: data.data
+        albumList: Response.data
       })
     })
   }

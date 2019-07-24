@@ -1,13 +1,13 @@
 import React from 'react'
-import styles from './contentBlock.scss'
+import styles from './cardList.scss'
 import { Card, Divider  } from 'antd';
-
 import { Link } from 'react-router-dom'
-
 import { separateSingers } from '@/utils'
+import { getNewlySingleAPI } from '@/api'
+
 const { Meta } = Card;
 
-export default class ContentBlock extends React.Component{
+export default class CardList extends React.Component{
   constructor(props){
     super(props)
     this.state = {
@@ -26,19 +26,12 @@ export default class ContentBlock extends React.Component{
   }
 
   getNewlyMusic() {
-    const url = 'https://v1.itooi.cn/netease/song/newest'
-    fetch(url)
-    .then( response => {
-      return response.json()
-    })
-    .then( data => {
-      if(data.code===200)
+    getNewlySingleAPI().then( response => {
       this.setState({
-        newList: data.data
+        newList: response.data
       })
     })
   }
-
 
   render() {
     return <section style={{padding: '0 5% 30px 5%',  background: '#fff'}}>

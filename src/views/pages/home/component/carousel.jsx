@@ -2,6 +2,8 @@ import React from 'react'
 import { Carousel, Card, Divider } from 'antd'
 import styles from './carousel.scss'
 import { Link } from 'react-router-dom'
+import { getCarouselsAPI, getHotSongListsAPI } from '@/api'
+
 
 export default class homeCarousel extends React.Component {
   constructor(props) {
@@ -13,8 +15,8 @@ export default class homeCarousel extends React.Component {
   }
 
   componentDidMount() {
-    this.getCarousel()
-    this.getHot()
+    this.getCarousels()
+    this.getHotSongLists()
   }
 
   componentWillUnmount(){
@@ -23,30 +25,23 @@ export default class homeCarousel extends React.Component {
      }
   }
 
-
-  getHot(cat = '全部', pageSize = 6, page = 0) {
-    const url = `https://v1.itooi.cn/netease/songList/hot?cat=${cat}&pageSize=${pageSize}&page=${page}`
-    fetch(url)
-    .then( response => {
-      if(response.status === 200)
-        return response.json()
-    })
-    .then( data => {
+  getCarousels() {
+    getCarouselsAPI().then( response => {
       this.setState({
-        hot: data.data
+        pics: response.data
       })
     })
   }
 
-  getCarousel() {
-    fetch('https://v1.itooi.cn/netease/banner')
-    .then( response => {
-      if(response.status === 200)
-        return response.json()
-    })
-    .then( data => {
+  getHotSongLists() {
+    const params = {
+      cat: '全部',
+      pageSize: 6,
+      page: 0
+    }
+    getHotSongListsAPI(params).then( response => {
       this.setState({
-        pics: data.data
+        hot: response.data
       })
     })
   }
