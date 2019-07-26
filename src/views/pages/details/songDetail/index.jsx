@@ -1,17 +1,20 @@
-import React from 'react'
+import React from 'react';
 
-import SongDetail from './songDetail'
+import SongDetail from './songDetail';
 
 export default class SongDetailsWrap extends React.Component {
-  constructor(props){
-    super(props)
+  constructor(props) {
+    super(props);
     this.state = {
-      id: props.match.params.id
-    }
+      id: props.match.params.id,
+    };
   }
+
   render() {
-    return <section style={{margin: '0 10%', background: '#FFF'}}>
-      <SongDetail id={this.state.id}></SongDetail>
-    </section>
-  } 
+    return (
+      <section style={{ margin: '0 10%', background: '#FFF' }}>
+        <SongDetail id={this.state.id} />
+      </section>
+    );
+  }
 }
